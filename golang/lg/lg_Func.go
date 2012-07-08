@@ -10,19 +10,12 @@ func main() {
 
 	q6_average([]float64{3.1, 3.14, 2.89})
 
-	var stack *IntStack
-	stack = new(IntStack)
-
-	stack.init(10)
-	stack.push(1)
-	stack.push(2)
-	stack.push(3)
-	stack.pop()
-	stack.pop()
+    q9_stackOperation()
 
 	return
 }
 
+// q6: average
 func q6_average(floatArray []float64) (av float64) {
 
 	defer func() {
@@ -45,6 +38,22 @@ func q6_average(floatArray []float64) (av float64) {
 }
 
 // q9: stack
+func q9_stackOperation(){
+    // Init a int stack
+	var stack *IntStack
+	stack = new(IntStack)
+	stack.init(10)
+
+    // Push stack
+	stack.push(1)
+	stack.push(2)
+	stack.push(3)
+
+    // Pop stack
+	stack.pop()
+	stack.pop()
+}
+
 type IntStack struct {
 	pos   int
 	capa  int
