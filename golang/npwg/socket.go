@@ -4,6 +4,8 @@ import(
   "net"
   "os"
   "fmt"
+  "time"
+  "io/ioutil"
 )
 
 var funcMap = map[string]func(args ...string){
@@ -11,6 +13,8 @@ var funcMap = map[string]func(args ...string){
   "Mask":Mask,
   "Resolve":Resolve,
   "Host":Host,
+  "HGHI":HGHI,
+  "Daytime":DaytimeSrv,
 }
 
 func main() {
@@ -91,6 +95,52 @@ func Host(s ...string) {
   return
 }
 
+func HGHI(s ...string) {
+  for _,srvStr := range s {
+    tcpAddr,err := net.ResolveTCPAddr("tcp4",srvStr)
+    checkErr("ResolveTCPAddr",err)
+
+    conn,err := net.DialTCP("tcp",nil,tcpAddr)
+    checkErr("DialTCP",err)
+
+    _,err = conn.Write([]byte("HEAD / HTTP/1.0\r\n\r\n"))
+    checkErr("conn.Write",err)
+
+    result,err := ioutil.ReadAll(conn)
+    checkErr("ioutil.ReadAll",err)
+
+    fmt.Println("*** Result for Accessing ",srvStr," ***")
+    fmt.Println(string(result))
+    fmt.Println("***************************************")
+  }
+
+  return
+}
+
+func DaytimeSrv(s ...string) {
+  service := ":1200"
+  tcpAddr,err := net.ResolveTCPAddr("ip4",service)
+  checkErr("ResolveTCPAddr",err)
+
+  listener,err := net.ListenTCP("tcp",tcpAddr)
+  checkErr("ListenTCP",err)
+    
+  for {
+
+    conn,err := listener.Accept()
+    if err != nil {
+      continue
+    }
+
+    daytime := time.Now().String()
+
+    conn.Write([]byte(daytime))
+    conn.Close()
+  }
+    
+}
+
+// Util Functions
 func help( args []string){
   fmt.Fprintf(os.Stderr,"Usage:%s <Command> [Args]\n",args[0])
   fmt.Fprintf(os.Stderr,"  Supported command:\n")
@@ -98,5 +148,12 @@ func help( args []string){
     fmt.Fprintf(os.Stderr,"    %s\n",name)
   }
   os.Exit(1)
+}
+
+func checkErr(s string,err error) {
+  if err != nil {
+    fmt.Fprintf(os.Stderr,"%s:%s",s,err.Error())
+    os.Exit(1)
+  }
 }
 
