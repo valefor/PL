@@ -1,36 +1,41 @@
 #include <string>
 #include <map>
 
+
 class CxxPrimerExercise {
     int number;
-    string desc;
+    std::string desc;
 
+    public:
+    CxxPrimerExercise();
 };
 
 class CxxPrimerSection {
-    map<int,string> index;
-    map<int,CxxPrimerExercise*> exercises;
+    std::map<int,std::string> index;
+    std::map<int,CxxPrimerExercise*> exercises;
 
     public:
     CxxPrimerSection();
-    CxxPrimerChapter_addSection(int number,string name,CxxPrimerExercise section);
+    void addExercise(int number,std::string name,CxxPrimerExercise section);
 };
 
 class CxxPrimerChapter {
-    map<int,string> index;
-    map<int,CxxPrimerSection*> sections;
+    std::map<int,std::string> index;
+    std::map<int,CxxPrimerSection*> sections;
 
     public:
     CxxPrimerChapter();
-    CxxPrimerChapter_addSection(int number,string name,CxxPrimerSection section);
+    void addSection(int number,std::string name,CxxPrimerSection section);
     
 };
 
 class CxxPrimer {
-    map<int,CxxPrimerChapter*> chapters;
+    std::string bookName;
+    std::map<int,CxxPrimerChapter*> chapters;
 
     public:
-    CxxPrimer();
-    CxxPrimer_addChapter(int number,CxxPrimerChapter chapter);
+    CxxPrimer(std::string);
+    void show();
+    void addChapter(int number,CxxPrimerChapter chapter);
 };
 

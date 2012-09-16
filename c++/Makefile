@@ -6,19 +6,19 @@ CXX = g++
 
 PLATFORM = CYGWIN
 
-USER_SRC = ex10_2.cc
+USER_SRC = CxxPrimer.cc
 
 LDFLAGS = 
 
 CXXFLAGS = -Wall -g
 
-GLOBAL_SRC = utils.cc
+GLOBAL_SRC = 
 
 OBJECTS = $(GLOBAL_SRC:.cc=.o) $(USER_SRC:.cc=.o) 
 
 LIB_PATH = 
 
-TARGET = transformer
+TARGET = cxxPrimer
 
 all: $(TARGET)
 
