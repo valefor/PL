@@ -6,26 +6,29 @@ class CxxPrimerExercise {
     int number;
     std::string desc;
 
+    void (*doIt)();
+
     public:
-    CxxPrimerExercise();
+    CxxPrimerExercise(int);
+    void setDoIt( void (*)() );
 };
 
 class CxxPrimerSection {
-    std::map<int,std::string> index;
+    std::string sectionName;
     std::map<int,CxxPrimerExercise*> exercises;
 
     public:
-    CxxPrimerSection();
-    void addExercise(int number,std::string name,CxxPrimerExercise section);
+    CxxPrimerSection(std::string);
+    void addExercise(int number,CxxPrimerExercise* exercise);
 };
 
 class CxxPrimerChapter {
-    std::map<int,std::string> index;
+    std::string chapterName;
     std::map<int,CxxPrimerSection*> sections;
 
     public:
-    CxxPrimerChapter();
-    void addSection(int number,std::string name,CxxPrimerSection section);
+    CxxPrimerChapter(std::string);
+    void addSection(int number,CxxPrimerSection* section);
     
 };
 
@@ -35,7 +38,8 @@ class CxxPrimer {
 
     public:
     CxxPrimer(std::string);
+    void init();
     void show();
-    void addChapter(int number,CxxPrimerChapter chapter);
+    void addChapter(int number,CxxPrimerChapter* chapter);
 };
 
