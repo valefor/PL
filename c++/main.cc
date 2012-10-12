@@ -1,30 +1,30 @@
-#include "CxxPrimer.h"
+#include "Book.h"
 #include <iostream>
 
 void ex_1_3();
 
 int main(int argc, char ** argv)
 {
-    CxxPrimer cxxPrimer = CxxPrimer("C++ Primer");
+    Book cxxPrimer = Book("C++ Primer");
 
-    CxxPrimerChapter *chapter1  = new CxxPrimerChapter("Getting Started");
-    CxxPrimerChapter *chapter2  = new CxxPrimerChapter("Variables and Basic Types");
-    CxxPrimerChapter *chapter3  = new CxxPrimerChapter("Library Types");
-    CxxPrimerChapter *chapter4  = new CxxPrimerChapter("Arrays and Pointers");
-    CxxPrimerChapter *chapter5  = new CxxPrimerChapter("Expressions");
-    CxxPrimerChapter *chapter6  = new CxxPrimerChapter("Statements");
-    CxxPrimerChapter *chapter7  = new CxxPrimerChapter("Functions");
-    CxxPrimerChapter *chapter8  = new CxxPrimerChapter("The IO Library");
-    CxxPrimerChapter *chapter9  = new CxxPrimerChapter("Sequential Containers");
-    CxxPrimerChapter *chapter10 = new CxxPrimerChapter("Associative Containers");
-    CxxPrimerChapter *chapter11 = new CxxPrimerChapter("Generic Algorithms");
-    CxxPrimerChapter *chapter12 = new CxxPrimerChapter("Classes");
-    CxxPrimerChapter *chapter13 = new CxxPrimerChapter("Copy Control");
-    CxxPrimerChapter *chapter14 = new CxxPrimerChapter("Overloaded Operations and Conversions");
-    CxxPrimerChapter *chapter15 = new CxxPrimerChapter("Object-Oriented Programming");
-    CxxPrimerChapter *chapter16 = new CxxPrimerChapter("Templates and Generic Programming");
-    CxxPrimerChapter *chapter17 = new CxxPrimerChapter("Tools for Large Programs");
-    CxxPrimerChapter *chapter18 = new CxxPrimerChapter("Specialized Tools and Techniques");
+    BookChapter *chapter1  = new BookChapter("Getting Started");
+    BookChapter *chapter2  = new BookChapter("Variables and Basic Types");
+    BookChapter *chapter3  = new BookChapter("Library Types");
+    BookChapter *chapter4  = new BookChapter("Arrays and Pointers");
+    BookChapter *chapter5  = new BookChapter("Expressions");
+    BookChapter *chapter6  = new BookChapter("Statements");
+    BookChapter *chapter7  = new BookChapter("Functions");
+    BookChapter *chapter8  = new BookChapter("The IO Library");
+    BookChapter *chapter9  = new BookChapter("Sequential Containers");
+    BookChapter *chapter10 = new BookChapter("Associative Containers");
+    BookChapter *chapter11 = new BookChapter("Generic Algorithms");
+    BookChapter *chapter12 = new BookChapter("Classes");
+    BookChapter *chapter13 = new BookChapter("Copy Control");
+    BookChapter *chapter14 = new BookChapter("Overloaded Operations and Conversions");
+    BookChapter *chapter15 = new BookChapter("Object-Oriented Programming");
+    BookChapter *chapter16 = new BookChapter("Templates and Generic Programming");
+    BookChapter *chapter17 = new BookChapter("Tools for Large Programs");
+    BookChapter *chapter18 = new BookChapter("Specialized Tools and Techniques");
 
     cxxPrimer.addChapter(1, chapter1);
     cxxPrimer.addChapter(2, chapter2);
@@ -45,12 +45,12 @@ int main(int argc, char ** argv)
     cxxPrimer.addChapter(17,chapter17);
     cxxPrimer.addChapter(18,chapter18);
 
-    CxxPrimerSection *section1 = new CxxPrimerSection("Writing a Simple C++ Program");
-    CxxPrimerSection *section2 = new CxxPrimerSection("A First Look at Input/Output");
+    BookSection *section1 = new BookSection("Writing a Simple C++ Program");
+    BookSection *section2 = new BookSection("A First Look at Input/Output");
     chapter1->addSection(1, section1);
     chapter1->addSection(2, section2);
 
-    CxxPrimerExercise *exercise1_3 = new CxxPrimerExercise(3);
+    BookExercise *exercise1_3 = new BookExercise(3);
     exercise1_3->setDoIt(ex_1_3);
     section2->addExercise(3, exercise1_3);
 

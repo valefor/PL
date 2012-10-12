@@ -1,11 +1,11 @@
-#include "CxxPrimer.h"
+#include "Book.h"
 #include <iostream>
 
 /* C++ Primer Main class */
-CxxPrimer::CxxPrimer(std::string name): bookName(name) {
+Book::Book(std::string name): bookName(name) {
 }
 
-void CxxPrimer::show() {
+void Book::show() {
     std::string upBar = "****************************************";
     std::string leftBar = "* Book Name: ";
     std::cout << upBar << "\n"
@@ -13,28 +13,28 @@ void CxxPrimer::show() {
               << upBar << std::endl;
 }
 
-void CxxPrimer::addChapter(int number,CxxPrimerChapter* chapter) {
+void Book::addChapter(int number,BookChapter* chapter) {
     chapters.insert( std::make_pair(number,chapter) );
 }
 /* C++ Primer chapter class */
-CxxPrimerChapter::CxxPrimerChapter(std::string name):chapterName(name) {
+BookChapter::BookChapter(std::string name):chapterName(name) {
 }
 
-void CxxPrimerChapter::addSection(int number,CxxPrimerSection* section) {
+void BookChapter::addSection(int number,BookSection* section) {
     sections.insert( std::make_pair(number,section) );
 }
 /* C++ Primer section class */
-CxxPrimerSection::CxxPrimerSection(std::string name):sectionName(name) {
+BookSection::BookSection(std::string name):sectionName(name) {
 }
 
-void CxxPrimerSection::addExercise(int number,CxxPrimerExercise* exercise) {
+void BookSection::addExercise(int number,BookExercise* exercise) {
     exercises.insert( std::make_pair(number,exercise) );
 }
 /* C++ Primer exercise class */
-CxxPrimerExercise::CxxPrimerExercise(int num):number(num) {
+BookExercise::BookExercise(int num):number(num),doIt(NULL) {
 
 }
 
-void CxxPrimerExercise::setDoIt( void (*doFunc)() ) {
+void BookExercise::setDoIt( void (*doFunc)() ) {
     doIt = doFunc;
 }

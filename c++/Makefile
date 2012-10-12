@@ -6,7 +6,7 @@ CXX = g++
 
 PLATFORM = CYGWIN
 
-USER_SRC = main.cc CxxPrimer.cc 
+USER_SRC = main.cc Book.cc 
 
 LDFLAGS = 
 
