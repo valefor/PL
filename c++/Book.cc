@@ -13,28 +13,32 @@ void Book::show() {
               << upBar << std::endl;
 }
 
-void Book::addChapter(int number,BookChapter* chapter) {
+Book& Book::addChapter(int number,Chapter* chapter) {
     chapters.insert( std::make_pair(number,chapter) );
+    return *this;
 }
 /* C++ Primer chapter class */
-BookChapter::BookChapter(std::string name):chapterName(name) {
+Chapter::Chapter(std::string name):chapterName(name) {
 }
 
-void BookChapter::addSection(int number,BookSection* section) {
+Chapter& Chapter::addSection(int number,Section* section) {
     sections.insert( std::make_pair(number,section) );
+    return *this;
 }
 /* C++ Primer section class */
-BookSection::BookSection(std::string name):sectionName(name) {
+Section::Section(std::string name):sectionName(name) {
 }
 
-void BookSection::addExercise(int number,BookExercise* exercise) {
+Section& Section::addExercise(int number,Exercise* exercise) {
     exercises.insert( std::make_pair(number,exercise) );
+    return *this;
 }
 /* C++ Primer exercise class */
-BookExercise::BookExercise(int num):number(num),doIt(NULL) {
+Exercise::Exercise(int num):number(num),doIt(NULL) {
 
 }
 
-void BookExercise::setDoIt( void (*doFunc)() ) {
+Exercise& Exercise::setDoIt( void (*doFunc)() ) {
     doIt = doFunc;
+    return *this;
 }

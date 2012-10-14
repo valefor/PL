@@ -2,44 +2,44 @@
 #include <map>
 
 
-class BookExercise {
+class Exercise {
     int number;
     std::string desc;
 
     void (*doIt)();
 
     public:
-    BookExercise(int);
-    void setDoIt( void (*)() );
+    Exercise(int);
+    Exercise& setDoIt( void (*)() );
 };
 
-class BookSection {
+class Section {
     std::string sectionName;
-    std::map<int,BookExercise*> exercises;
+    std::map<int,Exercise*> exercises;
 
     public:
-    BookSection(std::string);
-    void addExercise(int number,BookExercise* exercise);
+    Section(std::string);
+    Section & addExercise(int number,Exercise* exercise);
 };
 
-class BookChapter {
+class Chapter {
     std::string chapterName;
-    std::map<int,BookSection*> sections;
+    std::map<int,Section*> sections;
 
     public:
-    BookChapter(std::string);
-    void addSection(int number,BookSection* section);
+    Chapter(std::string);
+    Chapter & addSection(int number,Section* section);
     
 };
 
 class Book {
     std::string bookName;
-    std::map<int,BookChapter*> chapters;
+    std::map<int,Chapter*> chapters;
 
     public:
     Book(std::string);
     void init();
     void show();
-    void addChapter(int number,BookChapter* chapter);
+    Book & addChapter(int number,Chapter* chapter);
 };
 
