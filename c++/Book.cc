@@ -11,6 +11,13 @@ void Book::show() {
     std::cout << upBar << "\n"
               << leftBar << bookName << "\n"
               << upBar << std::endl;
+
+    std::map<int,Chapter*>::iterator iter = chapters.begin();
+    while( iter != chapters.end() )
+    {
+        std::cout << iter->first << " - " << iter->second->getName() << std::endl;
+        ++iter;
+    }
 }
 
 Book& Book::addChapter(int number,Chapter* chapter) {

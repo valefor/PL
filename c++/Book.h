@@ -1,7 +1,6 @@
 #include <string>
 #include <map>
 
-
 class Exercise {
     int number;
     std::string desc;
@@ -29,6 +28,7 @@ class Chapter {
     public:
     Chapter(std::string);
     Chapter & addSection(int number,Section* section);
+    std::string getName() { return chapterName;}
     
 };
 
