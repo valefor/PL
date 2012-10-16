@@ -10,7 +10,7 @@ USER_SRC = main.cc Book.cc Console.cc
 
 LDFLAGS = 
 
-CXXFLAGS = -Wall -g
+CXXFLAGS = -Wall -g 
 
 GLOBAL_SRC = 
 

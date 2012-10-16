@@ -1,4 +1,5 @@
 #include "Book.h"
+#include "Console.h"
 #include <iostream>
 
 void ex_1_3();
@@ -78,7 +79,10 @@ int main(int argc, char ** argv)
     section2->addExercise(3, exercise1_3);
     */
 
-    cxxPrimer.show();
+    //cxxPrimer.show();
+
+    Console csl = Console(cxxPrimer);
+    csl.start();
 }
 
 void ex_1_3() {
