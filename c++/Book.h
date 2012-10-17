@@ -12,7 +12,7 @@ class Exercise : public Operable {
     Exercise(int);
     Exercise& setDoIt( void (*)() );
     void show();
-    bool cd(Operable & );
+    Operable * cd(int);
 };
 
 class Section : public Operable {
@@ -22,8 +22,9 @@ class Section : public Operable {
     public:
     Section(std::string);
     Section & addExercise(int number,Exercise* exercise);
+    std::string getName() { return sectionName;}
     void show();
-    bool cd(Operable & );
+    Operable * cd(int);
 };
 
 class Chapter : public Operable {
@@ -35,7 +36,7 @@ class Chapter : public Operable {
     Chapter & addSection(int number,Section* section);
     std::string getName() { return chapterName;}
     void show();
-    bool cd(Operable & );
+    Operable * cd(int);
     
 };
 
@@ -47,7 +48,10 @@ class Book : public Operable {
     Book(std::string);
     void init();
     void show();
-    bool cd(Operable & );
+    Operable * cd(int);
     Book & addChapter(int number,Chapter* chapter);
 };
 
+typedef std::map<int,Exercise*> ExerciseMT;
+typedef std::map<int,Section*> SectionMT;
+typedef std::map<int,Chapter*> ChapterMT;

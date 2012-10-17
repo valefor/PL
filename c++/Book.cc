@@ -12,7 +12,7 @@ void Book::show() {
               << leftBar << bookName << "\n"
               << upBar << std::endl;
 
-    std::map<int,Chapter*>::iterator iter = chapters.begin();
+    ChapterMT::iterator iter = chapters.begin();
     while( iter != chapters.end() )
     {
         std::cout << iter->first << " - " << iter->second->getName() << std::endl;
@@ -20,16 +20,18 @@ void Book::show() {
     }
 }
 
-bool Book::cd(Operable & opra) {
-
-    return false;
-}
-
 Book& Book::addChapter(int number,Chapter* chapter) {
     chapters.insert( std::make_pair(number,chapter) );
     return *this;
 }
 
+Operable * Book::cd(int index) {
+    
+    ChapterMT::iterator it = chapters.find(index);
+    if(it != chapters.end()) return (Operable *) it->second;
+
+    return NULL;
+}
 
 /* C++ Primer chapter class */
 Chapter::Chapter(std::string name):chapterName(name) {
@@ -41,11 +43,17 @@ Chapter& Chapter::addSection(int number,Section* section) {
 }
 
 void Chapter::show() {
+    SectionMT::iterator iter = sections.begin();
+    while( iter != sections.end() )
+    {
+        std::cout << iter->first << " - " << iter->second->getName() << std::endl;
+        ++iter;
+    }
 }
 
-bool Chapter::cd(Operable & opra) {
+Operable * Chapter::cd(int index) {
 
-    return false;
+    return NULL;
 }
 
 /* C++ Primer section class */
@@ -60,11 +68,10 @@ Section& Section::addExercise(int number,Exercise* exercise) {
 void Section::show() {
 }
 
-bool Section::cd(Operable & opra) {
+Operable * Section::cd(int index) {
 
-    return false;
+    return NULL;
 }
-
 
 /* C++ Primer exercise class */
 Exercise::Exercise(int num):number(num),doIt(NULL) {
@@ -79,7 +86,7 @@ Exercise& Exercise::setDoIt( void (*doFunc)() ) {
 void Exercise::show() {
 }
 
-bool Exercise::cd(Operable & opra) {
+Operable * Exercise::cd(int index) {
 
-    return false;
+    return NULL;
 }

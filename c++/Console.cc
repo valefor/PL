@@ -50,6 +50,7 @@ bool Console::dispatch(CMD_TYPE cmdType,boost::smatch & sm) {
         case CT_QT: 
             return false;
         case CT_CD:
+            if( ( oprb = oprb->cd(std::atoi(sm.str(2).c_str())) ) );
             break;
         case CT_LS:
             oprb->show();
