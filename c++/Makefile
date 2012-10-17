@@ -8,7 +8,7 @@ PLATFORM = CYGWIN
 
 USER_SRC = main.cc Book.cc Console.cc
 
-LDFLAGS = 
+LDFLAGS = -lboost_regex-mt
 
 CXXFLAGS = -Wall -g 
 
@@ -25,7 +25,7 @@ all: $(TARGET)
 obj: $(OBJECTS);
 
 $(TARGET): $(OBJECTS)
-	$(CXX) $(LDFLAGS) -o $@ $^
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
