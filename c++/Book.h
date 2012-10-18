@@ -12,46 +12,31 @@ class Exercise : public Operable {
     Exercise(int);
     Exercise& setDoIt( void (*)() );
     void show();
-    Operable * cd(int);
+    void execute();
 };
 
 class Section : public Operable {
-    std::string sectionName;
-    std::map<int,Exercise*> exercises;
-
     public:
     Section(std::string);
     Section & addExercise(int number,Exercise* exercise);
-    std::string getName() { return sectionName;}
     void show();
-    Operable * cd(int);
+    void execute();
 };
 
 class Chapter : public Operable {
-    std::string chapterName;
-    std::map<int,Section*> sections;
-
     public:
     Chapter(std::string);
     Chapter & addSection(int number,Section* section);
-    std::string getName() { return chapterName;}
     void show();
-    Operable * cd(int);
+    void execute();
     
 };
 
 class Book : public Operable {
-    std::string bookName;
-    std::map<int,Chapter*> chapters;
-
     public:
     Book(std::string);
-    void init();
     void show();
-    Operable * cd(int);
+    void execute();
     Book & addChapter(int number,Chapter* chapter);
 };
 
-typedef std::map<int,Exercise*> ExerciseMT;
-typedef std::map<int,Section*> SectionMT;
-typedef std::map<int,Chapter*> ChapterMT;
