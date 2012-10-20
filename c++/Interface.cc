@@ -12,6 +12,16 @@ Operable * Operable::cd(int index) {
     return NULL;
 }
 
+bool Operable::show(int index) {
+    OperableMT::iterator it = oprbs.find(index);
+    if(it != oprbs.end()) {
+        it->second->show();
+        return true;
+    }
+
+    return false;
+}
+
 void Operable::show() {
     OperableMT::iterator iter = oprbs.begin();
     while( iter != oprbs.end() )

@@ -19,6 +19,7 @@ class Operable {
     std::string getName() { return name; }
     Operable * getParent() { return parent; }
 
+    bool show(int);
     virtual void show();
     virtual void execute() = 0;
     virtual ~Operable();

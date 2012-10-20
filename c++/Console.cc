@@ -14,32 +14,30 @@ void Console::start() {
 
     while (true)
     {
-        std::cout << "(csl):";
+        std::cout << ">:";
         std::getline(std::cin,cmd);
         CMD_TYPE ct = cmdFilter(cmd,matches);
         
-        //std::cout << "command:" << matches[1] << "\n";
 
         if (!dispatch(ct,matches)) break;
+
     }
 }
 
 Console::CMD_TYPE Console::cmdFilter(std::string cmd,boost::smatch & sm) {
+    //std::cout << "command:" << cmd << "\n";
     boost::regex lsRegex("(ls|show|s)[ \t]*(.*)");
     boost::regex cdRegex("(goto|g|cd)[ \t]*(.*)");
     boost::regex qtRegex("(quit|q|exit)[ \t]*(.*)");
     boost::regex excRegex("(ex|execute)[ \t]*(.*)");
+    boost::regex helpRegex("(help|h|\\?)[ \t]*(.*)");
     boost::regex undefRegex("([a-zA-Z]+)[ \t]*(.*)");
     
-
-    if(boost::regex_match(cmd,sm,lsRegex)) return CT_LS;
-    if(boost::regex_match(cmd,sm,cdRegex)) return CT_CD;
     if(boost::regex_match(cmd,sm,qtRegex)) return CT_QT;
+    if(boost::regex_match(cmd,sm,helpRegex)) return CT_HP;
+    if(boost::regex_match(cmd,sm,lsRegex)) return CT_LS;
     if(boost::regex_match(cmd,sm,excRegex)) return CT_EXC;
-    //if("ls" == cmd || "show"==cmd || "s" == cmd) return CT_LS;
-    //if("goto" == cmd || "g"==cmd || "cd" == cmd) return CT_CD;
-    //if("quit" == cmd || "q"==cmd || "exit" == cmd) return CT_QT;
-
+    if(boost::regex_match(cmd,sm,cdRegex)) return CT_CD;
     if(boost::regex_match(cmd,sm,undefRegex)) return CT_UNDEF;
 
     return CT_ERR;
@@ -47,6 +45,7 @@ Console::CMD_TYPE Console::cmdFilter(std::string cmd,boost::smatch & sm) {
 
 bool Console::dispatch(CMD_TYPE cmdType,boost::smatch & sm) {
 
+    //std::cout << "CMD_TYPE:" << cmdType << "\n";
     Operable * opr;
     switch(cmdType) {
       case CT_QT: 
@@ -61,7 +60,7 @@ bool Console::dispatch(CMD_TYPE cmdType,boost::smatch & sm) {
                 oprb = opr;
             }
             else {
-                std::cout << "cann't find item with index:" << sm.str(2) << "\n";
+                std::cout << "Cann't find item with index:" << sm.str(2) << "\n";
             }
           } else if(sm.str(2) == "..") {
             if(oprb->getParent()) oprb = oprb->getParent();
@@ -75,13 +74,25 @@ bool Console::dispatch(CMD_TYPE cmdType,boost::smatch & sm) {
         
         break;
       case CT_LS:
-        oprb->show();
+        if(sm.str(2).empty()) {
+          oprb->show();
+        } else {
+          const char * arg= sm.str(2).c_str();
+          if(std::atoi(arg)) {
+            if(!oprb->show(std::atoi(arg))) 
+              std::cout << "Cann't show item with index:" << sm.str(2) << "\n";
+          } else {
+            std::cout << "Invalid argument:" << sm.str(2) << ",only accept digits\n";
+          }
+        }
         break;
       case CT_EXC:
         oprb->execute();
         break;
       case CT_UNDEF:
         std::cout << "Unrecognized command:" << sm.str(1) <<"\n";
+      case CT_HP:
+        helper();
         break;
       default:
         ;
@@ -91,5 +102,20 @@ bool Console::dispatch(CMD_TYPE cmdType,boost::smatch & sm) {
 }
 
 void Console::helper() {
-    std::cout << ":cd,ls,ex" << std::endl;
+    
+    std::cout << "Usage: command [args...]:\n"
+        << "    cd <index>  Enter the sub directory with index,\n"
+        << "                'goto' or 'g' are candidates,about <index>:\n"
+        << "                '/' means root dir,'..' means parent dir\n"
+        << "\n"
+        << "    ls [index]  show information of current content,\n"
+        << "                argument 'index' is optional,only accept digits.\n"
+        << "                'show' or 'l' are candidates.\n"
+        << "\n"
+        << "    ex          execute current content if it's executable,\n"
+        << "                'execute' or 'e' are candidates.\n"
+        << "\n"
+        << "    quit        quit this program,'exit' or 'q' are candidates.\n"
+        << "\n"
+        << "    help        show help message,'h' and '?' are abbrevs.\n";
 }
