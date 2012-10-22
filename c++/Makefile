@@ -6,7 +6,7 @@ CXX = g++
 
 PLATFORM = CYGWIN
 
-USER_SRC = main.cc Book.cc Console.cc Interface.cc
+USER_SRC = main.cc Book.cc Console.cc Interface.cc CxxPrimer.cc
 
 LDFLAGS = -lboost_regex-mt
 

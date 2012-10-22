@@ -62,7 +62,7 @@ void Section::execute() {
 }
 
 /* C++ Primer exercise class */
-Exercise::Exercise(int num):Operable(),number(num),doIt(NULL) {
+Exercise::Exercise(std::string name):Operable(name),doIt(NULL) {
 
 }
 
@@ -73,6 +73,8 @@ Exercise& Exercise::setDoIt( void (*doFunc)() ) {
 }
 
 void Exercise::show() {
+    if(doIt) std::cout << "[Executable:TRUE]\n" ;
+    else std::cout << "[Executable:FALSE]\n" ;
 }
 
 void Exercise::execute() {

@@ -3,13 +3,10 @@
 #include "Interface.h"
 
 class Exercise : public Operable {
-    int number;
-    std::string desc;
-
     void (*doIt)();
 
     public:
-    Exercise(int);
+    Exercise(std::string);
     Exercise& setDoIt( void (*)() );
     void show();
     void execute();
