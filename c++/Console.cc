@@ -110,7 +110,7 @@ void Console::helper() {
         << "\n"
         << "    ls [index]  show information of current content,\n"
         << "                argument 'index' is optional,only accept digits.\n"
-        << "                'show' or 'l' are candidates.\n"
+        << "                'show' or 's' are candidates.\n"
         << "\n"
         << "    ex          execute current content if it's executable,\n"
         << "                'execute' or 'e' are candidates.\n"

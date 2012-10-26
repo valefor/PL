@@ -31,4 +31,5 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c $<
 
 clean:
-	rm -rf *.o *.exe *.dump
+	rm -rf *.o *.exe *.dump *.log
+	rm -rf latex html
