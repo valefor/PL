@@ -20,9 +20,15 @@ LIB_PATH =
 
 TARGET = cxxPrimer
 
+DOCDIR = ~/doxy/cxxPrimer
+DOXYCONFIG = cxxPrimerDox
+
 all: $(TARGET)
 
 obj: $(OBJECTS);
+
+doc: $(USER_SRC) $(GLOBAL_SRC)
+	doxygen $(DOXYCONFIG)
 
 $(TARGET): $(OBJECTS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
