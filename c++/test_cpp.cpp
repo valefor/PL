@@ -1,4 +1,5 @@
 #include <iostream>
+#include "stdio.h"
 
 class A {
     public:
@@ -42,15 +43,22 @@ class J :public A{
 };
 
 class D: public A,public B,public C,public F,public G,H {
-    int d;
+
     public:
+    mutable int d;
     D() {
         std::cout << "Class D" << std::endl; 
     }
+    
+    void setD(int newD) const { d = newD; }
 };
 
 class Base {
     public:
+    int i,j,k;
+
+    Base() : i(0),j(0),k(0) {}
+
     virtual void func() {
         std::cout << "vfunction in Base" << std::endl; 
     }
@@ -63,12 +71,29 @@ class Derived : public Base{
     }
 };
 
-class X { public : int i; };
+template<class classType,
+        class dataType1,
+        class dataType2>
+const char *
+accessOrder(
+    dataType1 classType::*member1,
+    dataType2 classType::*member2) {
+    classType ct;
+    printf("& member1 = %p\n", &(ct.*member1));
+    printf("& member2 = %p\n", &(ct.*member2));
+
+    return 
+         &(ct.*member1) < &(ct.*member2)
+        ?"member 1 occurs first"
+        :"member 2 occurs first";
+}
+
+class X { };
 class X_D1 : public virtual X { public: int j; };
 class X_D2 : public virtual X { public: double d; };
 class X_DD : public X_D1,public X_D2 { public: int k; };
 
-void foo (const A *pa) { pa->i = 1024; }
+//void foo (const A *pa) { pa->i = 1024; }
 
 /*
 typedef struct desc_struct {
@@ -153,13 +178,26 @@ int main() {
     std::cout << "sizeof E: " << sizeof(E) << std::endl;
     std::cout << "sizeof F: " << sizeof(F) << std::endl;
     std::cout << "sizeof D: " << sizeof(D) << std::endl;
+    std::cout << "& D::d = " << &D::d << std::endl;
     std::cout << "sizeof dd: " << sizeof(dd) << std::endl;
     std::cout << "sizeof d: " << sizeof(*d) << std::endl;
 
     Base b;
     Derived de;
     Base* bp = new Base(); 
-    std::cout << "sizeof : " << sizeof(b) << std::endl;
-    std::cout << "sizeof : " << sizeof(d) << std::endl;
-    std::cout << "sizeof : " << sizeof(*bp) << std::endl;
+    std::cout << "sizeof Base: " << sizeof(b) << std::endl;
+    std::cout << "sizeof Derived: " << sizeof(d) << std::endl;
+    std::cout << "sizeof poiter of Base: " << sizeof(*bp) << std::endl;
+    std::cout << "& Base::i = " << &Base::i << std::endl;
+    std::cout << "& Base::j = " << &Base::j << std::endl;
+    printf("& Base::i = %p\n", &Base::i);
+    printf("& Base::j = %p\n", &Base::j);
+    std::cout << "& Base::func = " << &Base::func << std::endl;
+
+    std::cout << "sizeof X: " << sizeof(X) << std::endl;
+    std::cout << "sizeof X_D1: " << sizeof(X_D1) << std::endl;
+    std::cout << "& X_D1::j = " << &X_D1::j << std::endl;
+    std::cout << "sizeof X_D2: " << sizeof(X_D2) << std::endl;
+
+    std::cout << accessOrder(&Base::j, &Base::k) << std::endl;
 }
