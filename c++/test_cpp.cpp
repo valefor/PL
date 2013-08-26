@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "stdio.h"
 
 class A {
@@ -169,6 +170,36 @@ int main()
 }
 */
 
+template <typename type>
+void
+printVector(std::vector<type> vec) {
+
+    // !!! 'typename'
+    // you must use 'typename' to tell compiler to treat 
+    // 'std::vector<type>::iterator' as a type
+    typename std::vector<type>::iterator it;
+
+    std::cout << '[';
+    for ( it = vec.begin(); it < vec.end(); it++ ) {
+        std::cout << ' ' << *it;
+    }
+    std::cout << ']' << std::endl;
+}
+
+void stl_vector_test() {
+    std::vector<int> myVector(1,100);
+
+    std::vector<int> emptyVector;
+    std::cout << "****** testcase:stl_vector_test <> START ******" << std::endl;
+    printVector(emptyVector);
+    printVector(myVector);
+    myVector.insert(myVector.end(), emptyVector.begin(), emptyVector.end());
+    emptyVector.insert(emptyVector.end(), myVector.begin(), myVector.end());
+    printVector(emptyVector);
+    printVector(myVector);
+    std::cout << "****** testcase:stl_vector_test <> END ******" << std::endl;
+}
+
 int main() {
     D dd;
     D* d = new D();
@@ -200,4 +231,6 @@ int main() {
     std::cout << "sizeof X_D2: " << sizeof(X_D2) << std::endl;
 
     std::cout << accessOrder(&Base::j, &Base::k) << std::endl;
+
+    stl_vector_test();
 }
