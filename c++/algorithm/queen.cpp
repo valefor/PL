@@ -54,10 +54,10 @@ class Chessboard {
     }
 
     ~Chessboard() {
-        free(row);
-        free(xl);
-        free(xr);
-        free(result);
+        delete [] row;
+        delete [] xl;
+        delete [] xr;
+        delete [] result;
     }
 
     void solve(int r);
