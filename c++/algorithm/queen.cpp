@@ -1,5 +1,9 @@
 /*
+ *  N queen question, DFS(Depth First Search) Algorithm
+ *
  * r - row, c - column
+ *
+ *  <<QUEEN>>
  *
  *  N6:
  *r/c 1 2 3 4 5 6
@@ -19,6 +23,17 @@
  *  5 - x - - - - - 
  *  6 - - - x - - - 
  *  7 - - - - - x - 
+ *
+ *  <<KNIGHT>>
+ *
+ *  N6:
+ *r/c 1 2 3 4 5 6
+ *  1 o o o o - -
+ *  2 x x o o - - 
+ *  3 o x x o - - 
+ *  4 o - o o - - 
+ *  5 o - o - - - 
+ *  6 - - - - - - 
  *
  * */
 
@@ -79,8 +94,8 @@ class Chessboard {
     void resizeResult(int n) {
         int old_size = result_size;
 
-        int ** result_new = new int*[n*number];
-        result_size = n*n;
+        result_size = n*n+1;
+        int ** result_new = new int*[result_size*number];
         result_new[0] = new int[result_size*n];
         for (int i =1; i< result_size; i++) result_new[i] = result_new[i-1]+ number;
 
@@ -135,7 +150,7 @@ void Chessboard::solve(int r) {
         if ( isAvailable(r,i) ) {
             mark(r,i);
             result[0][r-1] = i;
-            // Deep First Search
+            // Depth First Search
             solve(r+1);
             mark(r,i,true);
         }
