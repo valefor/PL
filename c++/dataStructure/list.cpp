@@ -3,6 +3,8 @@
  *
  */
 
+#include <queue>
+
 template<typename Type>
 class Node {
     Type data;
@@ -64,12 +66,31 @@ Node<Type>* List<Type>::reverse(Node<Type>* current) {
 // Tree Node
 template<typename Type>
 class TNode {
-    Type data;
+    Type* data;
     TNode<Type> * left, * right;
 };
 
 // Breadth Fisrt Search Binary Tree
+// To implement BFS, we need a queue, well, C++ STL provide one for us ;-)
 template<typename Type>
 class BST {
     TNode<Type> * root; 
+
+    public:
+    void traversal();
 };
+
+template<typename Type>
+void BST<Type>::traversal() {
+    if (!root) return;
+
+    std::queue<Type*> q;
+    q.push(root);
+    TNode<Type> * temp;
+    while (temp = q.pop()) {
+        // do something
+        // temp->data = new Type();
+        if (temp->left) q.push(temp->left);
+        if (temp->right) q.push(temp->right);
+    }
+}
