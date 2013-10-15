@@ -17,6 +17,8 @@ class Lock: public ILockable{
 
     explicit Lock(ILockable& lockable);
     virtual ~Lock();
+    inline bool lock() {}
+    inline bool unlock() {}
 
     private:
     // disallowed dynamic allocation
@@ -60,8 +62,10 @@ class Mutex : public ILockable{
         if ((res = pthread_mutex_unlock(&mutex_)) != 0)
         {
             std::cerr << "Failed to unlock mutex, res: " << res << std::endl;
+            return false;
         }
 
+        return true;
     }
 
     pthread_mutex_t * getMutex();
