@@ -1,5 +1,6 @@
 
 
+// simple sort
 void bubbleSort(int* array, int n) {
     
     for (int i = 0; i < n; i++) {
@@ -42,4 +43,27 @@ void insertSortP(int* array, int n) {
 
 }
 
-void fastSort
+// seperate sorted from unsorted elements
+// The Best choice in simple sort algorithms
+void selectSort(int * array, int n) {
+    for (int i = 0; i < n; i++) {
+        int temp = i;
+        for (int j = i+1; j < n ; j++) {
+            if (array[temp] > array[j]) {
+                temp = j;
+        }
+        if( temp != i) {
+            int t = array[i];
+            array[i] = array[temp];
+            array[temp] = t;
+            }
+        }
+    }
+}
+
+// Advance sort
+void quickSort(int* array, int start, int end) {
+
+
+}
+
