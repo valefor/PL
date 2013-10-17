@@ -82,25 +82,33 @@ void quickSort(int* array, int start, int end) {
 
     if (start >= end) return;
 
-    int i,j, key;
+    int i,j,k,key;
 
-    i = start;
+    i = k = start;
     j = end;
     key = array[i];
-    while ( i < j) {
-        if (array[j] < key) {
-            array[i] = array[j];
-            i++;
-            if ( i >= j) break;
-            if (array[i] > key) {
-                array[j] = array[i];
+    while (i < j) {
+        while (j > k) {
+            if (array[j] < key) {
+                k = j;
+                array[i] = array[j];
+                i++;
+                break;
             }
+            j--;
         }
-        j--;
+        
+        while (i < k) {
+            if (array[i] > key) {
+                k = i;
+                array[j] = array[i];
+                j--;
+                break;
+            }
+            i++;
+        }
     }
-
     array[i] = key;
-
     // at here, i == j
     print(array,start,end);
     quickSort(array, start, i);
@@ -113,11 +121,15 @@ void heapSort() {
 
 }
 
+void mergeSort() {
+
+}
+
 void print(int * array, int start, int end) {
     for (int i = start; i < end; i++) {
         std::cout << array[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << std::endl; `
 }
 
 int main() {
@@ -127,4 +139,8 @@ int main() {
 
     quickSort(a,0,n);
     print(a,0,n);
+
+    int b[] = {9,5,7,3,8,4,6,2,1};
+    quickSort(b,0,n);
+    print(b,0,n);
 }
