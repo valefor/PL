@@ -54,7 +54,7 @@ int find(char * target, char * substr, int * startIdx) {
 //  t[i] != s[i], that indicates t[0...i-1] == s[0...i-1]
 //  if there is a way to know s[0...j] == s[i-j-1...i-1], when mismatch happened,
 //  no need to regress to s[0] to start comparison again, start from s[j+1],
-//  here comparing s[j+1] and t[i] save about 'j' times of meanless comparison
+//  here comparing s[j+1] and t[i] saves about 'j' times of meanless comparison
 //  we need to evaluate the maximum 'j',
 //
 //
@@ -64,15 +64,18 @@ int* kmp(char * src, int n) {
     int * next = (int*)malloc(sizeof(int)*n);
 
     next[0] = -1;
-    //int i = 0;
-    for (int i = 0 ; i < n; i++) {
-        int max = 0; 
-        for (int k = 0; k < i; k++) {
-            if (src[k] == src[max]) {
-                k++,max++;
-            }
+    int i = 0, j = -1;
+    while ( i < n-1 ) {
+        if ( j == -1 || src[j] == src[i]) {
+            // s[0...k-1] == s[j-k...j-1]
+            j++;
+            i++;
+            if (src[j] != src[i])
+                next[i] = j;
+            else next[i] = next[j];
+        } else {
+            j = next[i];
         }
-        next[i] = max;
     }
 
     return next;
