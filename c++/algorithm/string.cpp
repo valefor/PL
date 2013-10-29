@@ -74,7 +74,7 @@ int* kmp(char * src, int n) {
                 next[i] = j;
             else next[i] = next[j];
         } else {
-            j = next[i];
+            j = next[j];
         }
     }
 
@@ -131,7 +131,7 @@ int main () {
     char * substr = "test";
 
     int pos = 0, startIdx = 0;
-    while ( (pos = find(target,substr,&startIdx)) > 0) {
+    while ( (pos = kmpFind(target,substr,&startIdx)) > 0) {
         std::cout << pos << std::endl;
     }
 }
