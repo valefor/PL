@@ -142,7 +142,9 @@ int length(const char * str) {
 //
 // return the longest palindromic string of
 // given string, return NULL if not find
-char * palindromic(const char * str) {
+//
+// complexity O(n^3) because 3 for loops
+char * palindromen3(const char * str) {
 
     int len = length(str);
     const char * p = str;
@@ -178,6 +180,17 @@ char * palindromic(const char * str) {
 
 }
 
+// Here is a palindrome algorithm with complexity O(n)!!
+// Don't use this algorithm in interview ...
+// How dose it work?
+// supose we have a string: abababa
+// we construct a new string by adding a char '#' beside each char
+//  T = #a#b#a#b#a#b#a#
+
+char * palindromen(const char * str) {
+
+
+}
 int main () {
     /*
     char * target = "The tttts tetest test string test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test";
@@ -208,5 +221,5 @@ int main () {
     std::cout << "Please enter a string:" << std::endl;
     std::cin >> input;
     
-    std::cout << palindromic(input.c_str()) << std::endl;
+    std::cout << palindrome(input.c_str()) << std::endl;
 }
