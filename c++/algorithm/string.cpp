@@ -4,7 +4,11 @@
  */
 #include <iostream>
 #include <stdlib.h>
-int length(char *);
+#include <fstream>
+#include <string>
+#include <string.h>
+
+int length(const char *);
 
 /*
  * @params
@@ -59,7 +63,7 @@ int find(char * target, char * substr, int * startIdx) {
 //
 //
 // high performance version
-int* kmp(char * src, int n) {
+int* kmp(const char * src, int n) {
 
     int * next = (int*)malloc(sizeof(int)*n);
 
@@ -78,10 +82,16 @@ int* kmp(char * src, int n) {
         }
     }
 
+    /*
+    for (int i = 0; i < n; i++ )
+        std::cout << next[i] << " ";
+    std::cout << std::endl;
+    */
+
     return next;
 }
 
-int kmpFind(char * target, char * substr, int * startIdx){
+int kmpFind(const char * target, const char * substr, int * startIdx){
     
     int targetLen = length(target);
     int subLen = length(substr);
@@ -90,14 +100,14 @@ int kmpFind(char * target, char * substr, int * startIdx){
 
     int * nextv = kmp(substr, subLen);
     int i = *startIdx, j = 0, ret = -1;
-    char * pt = target, *ps = substr;
+    const char * pt = target, *ps = substr;
     while (i <= (targetLen-subLen)) {
         
         if (pt[i] == ps[j]) {
             i++, j++;
         } else {
             if (nextv[j] == -1) {
-                i++, j == 0;
+                i++, j = 0;
             } else {
                 j = nextv[j];
             }
@@ -115,9 +125,9 @@ int kmpFind(char * target, char * substr, int * startIdx){
     return ret;
 }
 
-int length(char * str) {
+int length(const char * str) {
 
-    char * p = str ;
+    const char * p = str ;
     int i = 0;
 
     while ( *(p+i) != '\0') {
@@ -126,12 +136,77 @@ int length(char * str) {
     return i; 
 }
 
+// palindromic question
+//
+// the strings like this "aba" or "ababa"
+//
+// return the longest palindromic string of
+// given string, return NULL if not find
+char * palindromic(const char * str) {
+
+    int len = length(str);
+    const char * p = str;
+    int count = 0, max = count; 
+    
+    for (int k = 0; k < len; k++) {
+        const char * temp = str + k;
+        int i = k,j = len -1;
+        count = 0;
+        while (i < j) {
+    
+            if (str[i] == str[j]) {
+                count +=2;
+                i++, j--;
+            } else {
+                if (i==k) j--;
+                else i=k;
+            }
+        }
+        if (i==j) count++;
+        if (count > max) {
+            max = count;
+            p = temp;
+        }
+    }
+
+    char * ret = (char *) malloc(sizeof(char)*(max+1));
+
+    strncpy(ret, p, max);
+    ret[max] = '\0';
+
+    return ret;
+
+}
+
 int main () {
-    char * target = "The tttts test string test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test";
+    /*
+    char * target = "The tttts tetest test string test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test";
     char * substr = "test";
 
     int pos = 0, startIdx = 0;
     while ( (pos = kmpFind(target,substr,&startIdx)) > 0) {
         std::cout << pos << std::endl;
     }
+
+    std::ifstream file;
+    std::string line;
+    int lineNum = 1;
+    file.open("string.cpp");
+    
+    // use std getline to read one line each time
+    // or use '>>' to read a word each time
+    while (std::getline(file, line)) {
+        pos = 0,startIdx = 0;
+        std::cout << "LINE:" << line << std::endl;
+        while ( (pos = kmpFind(line.c_str(),substr,&startIdx)) > 0) {
+            std::cout << "Line:" << lineNum << ", Pos:" <<pos << std::endl;
+        }
+        lineNum ++;
+    }
+    */
+    std::string input;
+    std::cout << "Please enter a string:" << std::endl;
+    std::cin >> input;
+    
+    std::cout << palindromic(input.c_str()) << std::endl;
 }
