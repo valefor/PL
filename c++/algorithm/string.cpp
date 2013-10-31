@@ -143,7 +143,7 @@ int length(const char * str) {
 // return the longest palindromic string of
 // given string, return NULL if not find
 //
-// complexity O(n^3) because 3 for loops
+// complexity O(n^3) because of 3 for/while loops
 char * palindromen3(const char * str) {
 
     int len = length(str);
@@ -160,14 +160,19 @@ char * palindromen3(const char * str) {
                 count +=2;
                 i++, j--;
             } else {
-                if (i==k) j--;
-                else i=k;
+                if (i==k) {
+                    j--;
+                } else {
+                    i=k;
+                    count = 0;
+                }
             }
         }
         if (i==j) count++;
         if (count > max) {
             max = count;
             p = temp;
+    std::cout << "Len:" << len << ", Max:" << max << ", Pos:" << k << std::endl;
         }
     }
 
@@ -181,16 +186,84 @@ char * palindromen3(const char * str) {
 }
 
 // Here is a palindrome algorithm with complexity O(n)!!
-// Don't use this algorithm in interview ...
-// How dose it work?
-// supose we have a string: abababa
-// we construct a new string by adding a char '#' beside each char
-//  T = #a#b#a#b#a#b#a#
-
-char * palindromen(const char * str) {
-
-
+// Don't use this algorithm in interview because you are not expected to
+// take it out in that short interview time ...
+// How dose it work? Use symmetric property to reduce repeated computations
+// supose we have a string: abababac
+// we construct a new string by adding a char '#' beside each char, then calculate an
+// array P[], for each i in T[i], P[i] means the longest expand of T[i] concentrated 
+// palindrome on right hand. something like this
+//  S =   a   b   a   b   a   b   a   c
+//  T = ^ # a # b # a # b # a # b # a # c # $
+//  P = 0 0 1 0 3 0 5 0 7 0 5 0 3 0 1 0 1 0 0
+//
+//      0 1 2 3 4 5 6 7 8 9 
+//                        1-0 1 2 3 4 5 6 7 8
+//
+//  Ref: http://leetcode.com/2011/11/longest-palindromic-substring-part-ii.html
+//
+std::string preProcess(std::string str) {
+    int n = str.length();
+    // add a '^' as begin and a '$' as end of the string
+    if (n == 0) return "^$";
+    std::string ret = "^";
+    for (int i = 0; i < n; i++) ret += "#" + str.substr(i,1);
+    ret += "#$";
+    
+    std::cout << "T:" << ret << std::endl;
+    return ret;
 }
+
+std::string palindromen(std::string str) {
+
+    // construct string T
+    std::string T = preProcess(str);
+    int n = T.length();
+    int *P = new int[n];
+    int c = 1;
+    P[0] = P[n-1] = 0;
+    P[c] = P[n-1-c] = 0;
+
+    // calculate array P
+    for (int i = 2; i < n-2; i++) {
+        int R = c + P[c];
+        int i_mirror = 2 * c - i;
+        if ( R > i ) {
+            if (R - i > P[i_mirror]) {
+                P[i] = P[i_mirror];
+            } else { // P[i] >= R-i, then continue ...
+                P[i] = R-i;
+            }
+        } else {
+            P[i] = 0;
+        }
+
+        // If the palindrome centered at i does expand past R, 
+        // we update C to i, (the center of this new palindrome), 
+        // and extend R to the new palindrome’s right edge.
+        while (T[i+P[i]+1] == T[i-P[i]-1]) P[i]++;
+        if (i+P[i] > R) c = i;
+    }
+
+    // Ok, all thing's ready, calculate longest palindrome
+    int max = 0;
+    int pos = 0;
+    for (int j = 0; j < n; j ++) {
+        if (max < P[j]) pos = j,max = P[j];
+        //std::cout << P[j] << " ";
+    }
+    //std::cout << std::endl;
+
+    //std::cout << "Pos:" << pos << std::endl;
+    //std::cout << "Palin:" << max << std::endl;
+
+    delete[] P;
+
+    // (pos+1)/2 -1)- max/2 == (pos-1-max)/2
+    return str.substr(((pos+1)/2 -1)- max/2, max);
+    
+}
+
 int main () {
     /*
     char * target = "The tttts tetest test string test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test";
@@ -221,5 +294,13 @@ int main () {
     std::cout << "Please enter a string:" << std::endl;
     std::cin >> input;
     
-    std::cout << palindrome(input.c_str()) << std::endl;
+    //std::cout << palindromen3(input.c_str()) << std::endl;
+    //std::cout << palindromen("abababac") << std::endl;
+    std::string palin = palindromen(input);
+    std::cout << palin << std::endl;
 }
+/* Find the longest palindrome of the following long string ;-)
+FourscoreandsevenyearsagoourfaathersbroughtforthonthiscontainentanewnationconceivedinzLibertyanddedicatedtothepropositionthatallmenarecreatedequalNowweareengagedinagreahtcivilwartestingwhetherthatnaptionoranynartionsoconceivedandsodedicatedcanlongendureWeareqmetonagreatbattlefiemldoftzhatwarWehavecometodedicpateaportionofthatfieldasafinalrestingplaceforthosewhoheregavetheirlivesthatthatnationmightliveItisaltogetherfangandproperthatweshoulddothisButinalargersensewecannotdedicatewecannotconsecratewecannothallowthisgroundThebravelmenlivinganddeadwhostruggledherehaveconsecrateditfaraboveourpoorponwertoaddordetractTgheworldadswfilllittlenotlenorlongrememberwhatwesayherebutitcanneverforgetwhattheydidhereItisforusthelivingrathertobededicatedheretotheulnfinishedworkwhichtheywhofoughtherehavethusfarsonoblyadvancedItisratherforustobeherededicatedtothegreattdafskremainingbeforeusthatfromthesehonoreddeadwetakeincreaseddevotiontothatcauseforwhichtheygavethelastpfullmeasureofdevotionthatweherehighlyresolvethatthesedeadshallnothavediedinvainthatthisnationunsderGodshallhaveanewbirthoffreedomandthatgovernmentofthepeoplebythepeopleforthepeopleshallnotperishfromtheearth
+eforthepeopleshallnotperishfromthee
+*/
+
