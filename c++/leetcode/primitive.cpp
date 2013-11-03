@@ -6,6 +6,7 @@
 // Let's start
 #include <iostream>
 #include <string>
+#include <stdio.h>
 
 /*
  * Palindrome number
@@ -70,6 +71,22 @@ bool isMatch(const char * str, const char * reg) {
     return true;  
 }
 
+// Invert a integer in this way:
+//  Give a integer 3, it's "00000000 00000000 00000000 00000011" in binary format
+//  invert it : "11000000 00000000 00000000 00000000", supose we are on 32bit system
+unsigned int invert(unsigned int num) {
+    int ret = 0;
+    int bit = 0;
+
+    while (bit < 32) {
+        if (num & (1 << bit))
+        ret |= 1 << 31-bit;
+        bit ++ ;
+    }
+    printf("number:%x, invert: %x\n", num, ret);
+
+    return ret;
+}
 
 // test
 int main(void) {
@@ -81,4 +98,6 @@ int main(void) {
     std::cout << "aaa and \"aa\" is match?" << std::boolalpha << isMatch("aaa","aa") << std::endl;
     std::cout << "aab and \".*\" is match?" << std::boolalpha << isMatch("aab",".*") << std::endl;
     std::cout << "aab and \"c*a*b*\" is match?" << std::boolalpha << isMatch("aab","c*a*b*") << std::endl;
+
+    std::cout << "Invert of integer(364) is:" << invert(364) << std::endl; 
 }

@@ -3,21 +3,23 @@
 #include "stdio.h"
 
 class A {
+    int a;
     public:
     A() {
         std::cout << "Class A" << std::endl; 
     }
 };
 
-class B: public A {
+class B: virtual public A {
     int e;
+    //double f;
     public:
     B() {
         std::cout << "Class B" << std::endl; 
     }
 };
 
-class C: public A {
+class C: virtual public A {
     public:
     C() {
         std::cout << "Class C" << std::endl; 
@@ -40,10 +42,32 @@ class H :public A{
 class I :public A{
 };
 
-class J :public A{
+class J{
 };
 
-class D: public A,public B,public C,public F,public G,H {
+// class D: public B, public C
+//  Now, sizeof(D) is 4 + 4 = 8
+//  When B,C are virtual derived from A. sizeof(D) is 4+4+4*2 = 16
+//  (two more pointer which points to A to support shared subojects )
+//
+//  But now, 
+//  If B,C are not virtual derived from A, sizeof(D) is 4+4 = 8
+//  But if B,C are virtual derived from A, sizeof(D) is 4+4 +4*2 + `4' = 20
+//  Think anout why 4 bytes more?(Notice there is no virtual functions)
+//   
+//  +---------------+-- J
+//  |   int e       |\ \
+//  +---------------+ B \
+//  |   A * p2A     |/   \
+//  +---------------+     D(20)
+//  |   A * p2A     | C  /
+//  +---------------+   /
+//  | mutable int d |  /
+//  +---------------+ /
+//  | something.... |/ A/F/H
+//  +---------------+
+//
+class D: public B, public C,F,J{
 
     public:
     mutable int d;
