@@ -55,17 +55,17 @@ class J{
 //  But if B,C are virtual derived from A, sizeof(D) is 4+4 +4*2 + `4' = 20
 //  Think anout why 4 bytes more?(Notice there is no virtual functions)
 //   
-//  +---------------+-- J
-//  |   int e       |\ \
-//  +---------------+ B \
-//  |   A * p2A     |/   \
-//  +---------------+     D(20)
-//  |   A * p2A     | C  /
-//  +---------------+   /
-//  | mutable int d |  /
-//  +---------------+ /
-//  | something.... |/ A/F/H
-//  +---------------+
+//          +---------------+-- J
+//          |   int e       |\ \
+//          +---------------+ B \
+//      +---|   A * p2A     |/   \
+//      |   +---------------+     D(20)
+//      +---|   A * p2A     | C  /
+//      |   +---------------+   /
+//      |   | mutable int d |  /
+//      |   +---------------+ /
+//      +-->| something.... |/ A/F/H
+//          +---------------+
 //
 class D: public B, public C,F,J{
 

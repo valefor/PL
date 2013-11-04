@@ -2,3 +2,4 @@
 *.beam
 *.exe
 *.stackdump
+logfile

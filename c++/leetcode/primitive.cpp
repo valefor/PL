@@ -74,18 +74,47 @@ bool isMatch(const char * str, const char * reg) {
 // Invert a integer in this way:
 //  Give a integer 3, it's "00000000 00000000 00000000 00000011" in binary format
 //  invert it : "11000000 00000000 00000000 00000000", supose we are on 32bit system
+#define CHAR_BIT 8
 unsigned int invert(unsigned int num) {
+    /*
     int ret = 0;
     int bit = 0;
 
+    
     while (bit < 32) {
         if (num & (1 << bit))
         ret |= 1 << 31-bit;
         bit ++ ;
     }
+    */
+
+    // more graceful algorithm!
+    int ret = num;
+    // steps count
+    int s = sizeof(num) * CHAR_BIT - 1;
+    for (num >>= 1; num > 0; num >>= 1) {
+        ret <<= 1;
+        ret |= num & 1;
+        s --;
+    }
+    ret <<= s;
+
     printf("number:%x, invert: %x\n", num, ret);
 
     return ret;
+}
+
+// And two more bit operating tricks
+
+
+// Double Square Problem
+//  Des:
+//  A double-square number is an integer X which can be expressed as the sum of 
+//  two perfect squares. For example, 10 is a double-square because 10 = 32 + 12. 
+//  Your task in this problem is, given X, determine the number of ways in which 
+//  it can be written as the sum of two squares.
+int doubleSquare(unsigned int num) {
+    
 }
 
 // test
