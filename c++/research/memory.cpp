@@ -15,7 +15,7 @@ int main() {
 
     char *pc =(char*)malloc(5);
 
-    strcpy(pc,"fency post!");
+    //strcpy(pc,"fency post!");
     
     return 0;
 }
