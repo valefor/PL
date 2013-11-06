@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sched.h>
+
 //#include <dmalloc.h>
 
 /* 
@@ -36,6 +38,19 @@
  */
 
 // How to support multi-thread 
+#define SPINLOCK_INIT_VALUE 0
+
+typedef volatile uint32_t spinlock_t;
+static void lock(spinlock_t* lock) {
+    // GNU CAS implemetation
+    while (__sync_val_compare_and_swap(lock, 0, 1) == 1)
+        sched_yield();
+}
+
+static void unlock(spinlock_t* lock) {
+    *lock = 0;
+}
+
 /*
 static void lock(U32* lock)
 {
