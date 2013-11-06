@@ -110,7 +110,7 @@ unsigned int invert(unsigned int num) {
 // Double Square Problem
 //  Des:
 //  A double-square number is an integer X which can be expressed as the sum of 
-//  two perfect squares. For example, 10 is a double-square because 10 = 32 + 12. 
+//  two perfect squares. For example, 10 is a double-square because 10 = 3*3 + 1*1. 
 //  Your task in this problem is, given X, determine the number of ways in which 
 //  it can be written as the sum of two squares.
 int doubleSquare(unsigned int num) {

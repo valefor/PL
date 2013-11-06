@@ -19,16 +19,44 @@
  *
  */
 
-// Here are simple implementation prototype
+// Here is a simple implementation prototype
+//  No fence-post check, not support for multi-thread
  
 /* replace malloc/free by macro*/
 //#define malloc() _xmalloc()
+#ifdef DERR
+#error "This is an error message, you would see this when you open DERR flag at compile time..."
+#endif
 
 /* 
  * Build up your wrapped memory management functions
  *
- *  For example
+ *
+ *  For example:
  */
+
+// How to support multi-thread 
+/*
+static void lock(U32* lock)
+{
+#if defined(__FREEBSD__)
+    while (atomic_cmpset_acq_32(lock, 0, 1) != 1)
+        sched_yield();
+
+#elif defined(WIN32)
+    while (InterlockedCompareExchange(lock, 1, 0) == 1)
+        SleepEx(0,0);
+
+#elif defined(__GNUC__) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+    while (__sync_val_compare_and_swap(lock, 0, 1) == 1)
+        sleep(0);
+
+#else
+#error "Implementation missing"
+#endif
+}
+*/
+
 #define BUCKET_MAX 257
 // Define header which will be put before the allocated memory.
 typedef struct memHeader_s {
@@ -156,6 +184,7 @@ int main() {
 
     //strcpy(pc,"fency post!");
     int *p = (int *)app_malloc(sizeof(int));
+    p = (int *)app_malloc(sizeof(int));
     //app_free(p);
     //app_free(p);
     //atexit(atex);
