@@ -128,7 +128,12 @@ void * app_mallocFct(size_t size, const char* filename, int lineno) {
     header->next = NULL;
     unsigned int slot = (unsigned int)header%SLOT_MAX;
     unsigned int bucket = (unsigned int)header%BUCKET_MAX;
+    lock(&mem_table[slot].lock);
     header->next = mem_table[slot].table[bucket];
+    mem_table[slot].table[bucket] = header;
+    mem_table[slot].nbOfAlloc++;
+    unlock(&mem_table[slot].lock);
+    /*
     if (mem_table[slot]) {
         // insert this node to the begin of list
         memHeader_t * tmp = mem_table[slot];
@@ -137,6 +142,7 @@ void * app_mallocFct(size_t size, const char* filename, int lineno) {
     } else {
         mem_table[slot] = header;
     }
+    */
     header ++;
     return (void*)header;
 }
@@ -153,8 +159,11 @@ void app_freeFct(void * p, const char* filename, int line_no) {
         return;
     }
 
-    unsigned int slot = (unsigned int)p%BUCKET_MAX;
-    memHeader_t * tmp = mem_table[slot];
+    unsigned int slot = (unsigned int)p%SLOT_MAX;
+    unsigned int bucket = (unsigned int)p%BUCKET_MAX;
+
+    lock(&mem_table[slot].lock);
+    memHeader_t * tmp = mem_table[slot].table[bucket];
 
     if (tmp!=NULL) {
 
@@ -176,6 +185,7 @@ void app_freeFct(void * p, const char* filename, int line_no) {
             tmp = prev->next;
         }
     }
+    unlock(&mem_table[slot].lock);
 
     printf("[ERROR]Try to free memory(%p) which has been freed at %s:%d\n",p,filename,line_no);
     return;
