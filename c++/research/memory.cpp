@@ -72,7 +72,8 @@ static void lock(U32* lock)
 }
 */
 
-#define BUCKET_MAX 257
+#define SLOT_MAX 257
+#define BUCKET_MAX 1023
 // Define header which will be put before the allocated memory.
 typedef struct memHeader_s {
     struct memHeader_s * next;
@@ -82,8 +83,15 @@ typedef struct memHeader_s {
     int lineno;
 } memHeader_t;
 
-memHeader_t * mem_table[BUCKET_MAX];
-bool isTableInited = false;
+typedef struct memBucket_s{
+    spinlock_t lock;
+    uint32_t nbOfAlloc;
+    memHeader_t * table[BUCKET_MAX];
+} memBucket_t;
+
+// global variables will be initialized by compiler
+memBucket_t mem_table[SLOT_MAX];
+bool isRegistered = false;
 
 void mem_check() {
 
@@ -102,15 +110,15 @@ void mem_check() {
 
 void * app_mallocFct(size_t size, const char* filename, int lineno) {
 
-    if (!isTableInited) {
+    if (!isRegistered) {
     
-        for (int i = 0; i < BUCKET_MAX; i++) {
-            mem_table[i] = NULL;
-        }
+        //for (int i = 0; i < BUCKET_MAX; i++) {
+        //    mem_table[i] = NULL;
+        //}
 
         // register memory check function to atexit()
         atexit(mem_check);
-        isTableInited = true;
+        isRegistered = true;
     }
 
     memHeader_t * header = (memHeader_t *)malloc(sizeof(memHeader_t)+size);
@@ -118,7 +126,9 @@ void * app_mallocFct(size_t size, const char* filename, int lineno) {
     header->file = filename;
     header->lineno = lineno;
     header->next = NULL;
-    unsigned int slot = (unsigned int)header%BUCKET_MAX;
+    unsigned int slot = (unsigned int)header%SLOT_MAX;
+    unsigned int bucket = (unsigned int)header%BUCKET_MAX;
+    header->next = mem_table[slot].table[bucket];
     if (mem_table[slot]) {
         // insert this node to the begin of list
         memHeader_t * tmp = mem_table[slot];
