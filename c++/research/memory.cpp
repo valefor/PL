@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sched.h>
+#include <pthread.h>
 
 //#include <dmalloc.h>
 
@@ -39,38 +40,18 @@
 
 // How to support multi-thread 
 #define SPINLOCK_INIT_VALUE 0
+#define SPINLOCK_SET_VALUE 1
 
 typedef volatile uint32_t spinlock_t;
 static void lock(spinlock_t* lock) {
     // GNU CAS implemetation
-    while (__sync_val_compare_and_swap(lock, 0, 1) == 1)
+    while (__sync_val_compare_and_swap(lock, SPINLOCK_INIT_VALUE, SPINLOCK_SET_VALUE) == 1)
         sched_yield();
 }
 
 static void unlock(spinlock_t* lock) {
-    *lock = 0;
+    *lock = SPINLOCK_INIT_VALUE;
 }
-
-/*
-static void lock(U32* lock)
-{
-#if defined(__FREEBSD__)
-    while (atomic_cmpset_acq_32(lock, 0, 1) != 1)
-        sched_yield();
-
-#elif defined(WIN32)
-    while (InterlockedCompareExchange(lock, 1, 0) == 1)
-        SleepEx(0,0);
-
-#elif defined(__GNUC__) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
-    while (__sync_val_compare_and_swap(lock, 0, 1) == 1)
-        sleep(0);
-
-#else
-#error "Implementation missing"
-#endif
-}
-*/
 
 #define SLOT_MAX 257
 #define BUCKET_MAX 1023
@@ -96,12 +77,14 @@ bool isRegistered = false;
 void mem_check() {
 
     memHeader_t * p ;
-    for (int i = 0; i < BUCKET_MAX; i++) {
-        p = mem_table[i];
-        while (p) {
-            printf("[ERROR]Unfreed memory:%p(%d bytes), at %s:%d\n",
+    for (int i = 0; i < SLOT_MAX; i++) {
+        for (int j = 0; j < BUCKET_MAX; j++) {
+            p = mem_table[i].table[j];
+            while (p) {
+                printf("[ERROR]Unfreed memory:%p(%d bytes), at %s:%d\n",
                     p, p->size, p->file, p->lineno);
-            p = p->next;
+                p = p->next;
+            }
         }
     }
 }
@@ -133,16 +116,7 @@ void * app_mallocFct(size_t size, const char* filename, int lineno) {
     mem_table[slot].table[bucket] = header;
     mem_table[slot].nbOfAlloc++;
     unlock(&mem_table[slot].lock);
-    /*
-    if (mem_table[slot]) {
-        // insert this node to the begin of list
-        memHeader_t * tmp = mem_table[slot];
-        mem_table[slot] = header;
-        header->next = tmp;
-    } else {
-        mem_table[slot] = header;
-    }
-    */
+
     header ++;
     return (void*)header;
 }
@@ -159,8 +133,8 @@ void app_freeFct(void * p, const char* filename, int line_no) {
         return;
     }
 
-    unsigned int slot = (unsigned int)p%SLOT_MAX;
-    unsigned int bucket = (unsigned int)p%BUCKET_MAX;
+    unsigned int slot = ((unsigned int)p)%SLOT_MAX;
+    unsigned int bucket = ((unsigned int)p)%BUCKET_MAX;
 
     lock(&mem_table[slot].lock);
     memHeader_t * tmp = mem_table[slot].table[bucket];
@@ -168,8 +142,11 @@ void app_freeFct(void * p, const char* filename, int line_no) {
     if (tmp!=NULL) {
 
         if (tmp==p) {
-            mem_table[slot] = tmp->next;
+            mem_table[slot].table[bucket] = tmp->next;
             free(p);
+            // Don't forget to unlock before return
+            mem_table[slot].nbOfAlloc--;
+            unlock(&mem_table[slot].lock);
             return;
         }
 
@@ -179,6 +156,9 @@ void app_freeFct(void * p, const char* filename, int line_no) {
             if (tmp == p) {
                 prev->next = tmp->next;
                 free(p);
+                // Don't forget to unlock before return
+                mem_table[slot].nbOfAlloc--;
+                unlock(&mem_table[slot].lock);
                 return;
             }
             prev = tmp;
@@ -206,10 +186,11 @@ void app_freeFct(void * p, const char* filename, int line_no) {
 #define free(x) APP_FREE_ERR
 //#endif
 
-void atex(void) {
-
-    printf("exiting...\n");
+void * run(void *) {
+    int * p = (int *)app_malloc(sizeof(int));
 }
+
+#define NUM_THREAD 5
 // test dmalloc library
 // using "g++ -o test memory.cpp -ldmalloc -DDMALLOC -DDMALLOC_FUNC_CHECK"
 int main() {
@@ -219,9 +200,19 @@ int main() {
 
     //strcpy(pc,"fency post!");
     int *p = (int *)app_malloc(sizeof(int));
-    p = (int *)app_malloc(sizeof(int));
-    //app_free(p);
-    //app_free(p);
-    //atexit(atex);
+    //p = (int *)app_malloc(sizeof(int));
+    app_free(p);
+    app_free(p);
+    app_free(0);
+
+    // Here we fork some new threads
+    pthread_t theads[NUM_THREAD];
+    int rc;
+    long t;
+    for (t = 0; i < NUM_THREAD; t++) {
+        printf("In main thread, creating thread %ld\n", t);
+    }
+
+    pthread_exit(NULL);
     exit(0);
 }
