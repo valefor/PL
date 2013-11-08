@@ -211,6 +211,7 @@ int main() {
     long t;
     for (t = 0; i < NUM_THREAD; t++) {
         printf("In main thread, creating thread %ld\n", t);
+        //rc = pthread_create
     }
 
     pthread_exit(NULL);
