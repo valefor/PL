@@ -129,7 +129,7 @@ void print(int * array, int start, int end) {
     for (int i = start; i < end; i++) {
         std::cout << array[i] << " ";
     }
-    std::cout << std::endl; `
+    std::cout << std::endl;
 }
 
 int main() {
