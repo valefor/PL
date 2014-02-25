@@ -209,9 +209,13 @@ int main() {
     pthread_t theads[NUM_THREAD];
     int rc;
     long t;
-    for (t = 0; i < NUM_THREAD; t++) {
+    for (t = 0; t < NUM_THREAD; t++) {
         printf("In main thread, creating thread %ld\n", t);
-        //rc = pthread_create
+        rc = pthread_create(&theads[t], NULL, run, (void*)t);
+        if (rc) {
+            printf("[Error]Return code from pthread_create is %d\n", rc);
+            exit(-1);
+        }
     }
 
     pthread_exit(NULL);
