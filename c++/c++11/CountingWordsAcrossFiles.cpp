@@ -51,6 +51,8 @@ int main(int argc, char** argv) {
     WordCountMapType wordCounts;
 
     for (auto&f: futures) {
+        // Invoke 'get' more than once on a std::future yields undefined behavior
+        // Invoke 'get' more than once on a std::shared_future yields the same result
         const auto results = f.get();
 
         for (const auto& wordCount: results) {
