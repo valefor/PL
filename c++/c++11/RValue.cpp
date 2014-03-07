@@ -26,7 +26,7 @@
                 //only to have the temporaries evaporate along with your modifications, 
                 //would lead to subtle and obnoxious bugs, when temporaries disappear,
                 // &a points to hell.
-    const int &a = 0; // ok: & can
+    const int &a = 0; // definitely ok
     int && a = 0; // a is lvalue, 0 is rvalue
 
     int && foo();// function declaration
@@ -48,8 +48,9 @@ void tempFunc(T && t) // Notice: here the 't' is always lvalue
     tempFunc(j); // j is int ref,template argument T will be deduced to int&
     tempFunc(4); // 4 is int rvalue,template argument T will be deduced to int
     
-    ! How to disable template arguments deduction, declare template function like this:
-    template <typename T> void tempFunc(templateClass<t> t)
+    !How to disable template arguments deduction(implicit), declare template function like this:
+    template <typename T> void tempFunc(templateClass<T> t),then you must specify argument
+    type when call this function(tempFunc<T>(t))
 
     II, Reference collasping rule:
     T   +   &*   =>  T&*
