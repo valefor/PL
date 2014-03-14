@@ -26,7 +26,9 @@
                 //only to have the temporaries evaporate along with your modifications, 
                 //would lead to subtle and obnoxious bugs, when temporaries disappear,
                 // &a points to hell.
-    const int &a = 0; // definitely ok
+    const int &a = 0; // definitely ok, becasue const will give &a new sementic, 'const' will
+                // tell compiler that "please persist object that is referred by &a", without
+                // 'const', the temporary object(rvalue:0) will be recycled at any time
     int && a = 0; // a is lvalue, 0 is rvalue
 
     int && foo();// function declaration

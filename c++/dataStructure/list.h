@@ -16,9 +16,9 @@ class Node {
 
 // Bi-direction linked node
 template<typename Type>
-class NBode {
+class BNode {
     Type data;
-    NBode * next, * prev;
+    BNode * next, * prev;
 };
 
 // The basic linked list

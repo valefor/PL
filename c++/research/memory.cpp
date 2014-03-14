@@ -182,7 +182,7 @@ void app_freeFct(void * p, const char* filename, int line_no) {
 //#endif
 
 //#ifdef free
-#define APP_FREE_ERR  err_free_disabled_use_app_malloc_instead
+#define APP_FREE_ERR  err_free_disabled_use_app_free_instead
 #define free(x) APP_FREE_ERR
 //#endif
 

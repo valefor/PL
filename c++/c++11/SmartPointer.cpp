@@ -1,6 +1,26 @@
 #include <iostream>
 #include <memory>
 
+// Generic Programming
+
+template <typename T>
+class MySmartPtr
+{
+    public:
+    // constructor template
+    // Note, here heldPtr(other.get()) constraint that T* can be initialized by U*
+    //  Example:
+    //      MySmartPtr<Base> b = MySmartPtr<Derived>(new Derived()) // valid
+    //      MySmartPtr<Derived> d = MySmartPtr<Base>(new Base()) // invalid
+    template <typename U>
+    MySmartPtr(const MySmartPtr<U>& other) : heldPtr(other.get()){};
+
+    T * get() {return heldPtr;}
+    
+    private:
+    T * heldPtr;
+};
+
 std::weak_ptr<int> wp;
 /* Notes *
     * std::weak_ptr *
