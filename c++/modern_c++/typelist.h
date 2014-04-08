@@ -12,20 +12,30 @@ struct TypeListLength
     enum { value = 0 };
 };
 
+
 template <class T, class U>
 struct TypeListLength< TypeList<T,U> >
 {
     enum { value = 1 + TypeListLength<U>::value };
 };
 
-template <class T, class U, unsigned int i> struct At< TypeList<T,U>, 0 >
+/* 
+ * TypeList<T,U> is also a type 
+ *  Types of Type<0> and Type<1> are different 
+ */
+
+template <class TList, unsigned int i> struct TypeAt;
+
+template <class T, class U>
+struct TypeAt< TypeList<T,U>, 0 >
 {
-    typedef typename TypeList::Head Result;
+    typedef T result;
 };
 
-template <typename TypeList, unsigned int i> struct At< TypeList, i >
+template <class T, class U, unsigned int i>
+struct TypeAt< TypeList<T,U>, i >
 {
-    typedef typename At<TypeList<Tail>,i-1>::Result Result;
+    typedef typename TypeAt<U,i-1>::result result;
 };
 
 template <class T, class U>
@@ -33,8 +43,14 @@ class TypeList
 {
     public:
     
-    typedef T Head;
-    typedef U Tail;
+    typedef T head;
+    typedef U tail;
+    
+    template<unsigned int i>
+    struct At
+    {
+        typedef typename TypeAt<TypeList<T,U>,i>::result type;
+    };
 
     enum { length = TypeListLength< TypeList<T,U> >::value };
 };
