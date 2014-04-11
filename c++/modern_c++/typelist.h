@@ -26,6 +26,12 @@ struct TypeListLength< TypeList<T,U> >
 
 template <class TList, unsigned int i> struct TypeAt;
 
+template <unsigned int i>
+struct TypeAt< NullType, i >
+{
+    typedef NullType result;
+};
+
 template <class T, class U>
 struct TypeAt< TypeList<T,U>, 0 >
 {
