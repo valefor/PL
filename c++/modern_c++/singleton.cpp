@@ -1,6 +1,8 @@
 #include "singleton.h"
 
-// definition of static member variable here
+// Definition of static variable members here
+// Because static members belong to class instead of instance
+// they are very like function members
 bool Singleton::destroyed_ = false;
 Singleton * Singleton::instance_  = nullptr;
 
@@ -18,5 +20,7 @@ Singleton & Singleton::getInstance() {
 
 int main() {
 
-    Singleton& st = Singleton::getInstance();
+    {
+        Singleton& st = Singleton::getInstance();
+    }
 }
