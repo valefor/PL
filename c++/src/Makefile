@@ -6,13 +6,16 @@ LD 	= ld
 GCC = gcc
 CXX = g++
 #Var
-PLATFORM = CYGWIN
-LIB_PATH = 
+PLATFORM= CYGWIN
+LIB_PATH= 
 #Flags
-HDR_DIR = ../lib/
-CFLAG 	= -I$(HDR_DIR) -Wall -O -g
-CXXFLAGS= -I$(HDR_DIR) -O -g
-LDFLAGS = 
+HDR_DIR= ../lib/
+CFLAG= -I$(HDR_DIR) -Wall -O -g
+CXXFLAGS= -I$(HDR_DIR) -std=c++11 -O -g
+LDFLAGS= 
+GCC_VERSION_FULL=`gcc --version |head -n 1`
+GCC_VERSION=$(word 3, $(GCC_VERSION_FULL))
+PWD=`pwd`
 
 ACHIIVES=myLibTest
 

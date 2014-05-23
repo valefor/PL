@@ -1,5 +1,7 @@
 #include "mutex.h"
 
+ILockable::~ILockable() {}
+
 Lock::~Lock() {
 
     if (isLocked_) {
@@ -13,7 +15,6 @@ Lock::Lock(ILockable& lockable) :itsLockable(lockable) {
 
 
 Mutex::Mutex() {
-
     memset(&mutex_, 0, sizeof(pthread_mutex_t));
 
     int ret;
