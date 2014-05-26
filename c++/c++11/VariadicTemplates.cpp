@@ -58,6 +58,6 @@ void printf(const char * s, T value, Args ... args) {
 int main() {
     //StaticArray<1,2,3> a3;
     printf("Hello");
-    printf("%s"," world");
+    printf(" % %","world", "alucard");
 
 }
