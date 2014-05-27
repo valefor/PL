@@ -34,6 +34,6 @@ int main(void) {
     for (int i = 0; i < 3; i++) {
         std::cout << "This is main process[" << i << "]" << std::endl; 
     }
-    pthread_join(id,NULL);
+    //pthread_join(id,NULL);
     return 0;
 }
