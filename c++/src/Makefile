@@ -11,11 +11,16 @@ LIB_PATH=
 #Flags
 HDR_DIR= ../lib/
 CFLAG= -I$(HDR_DIR) -Wall -O -g
-CXXFLAGS= -I$(HDR_DIR) -std=c++11 -O -g
+CXXFLAGS= -I$(HDR_DIR) -std=c++11 -O -g -O2
 LDFLAGS= 
-GCC_VERSION_FULL=`gcc --version |head -n 1`
-GCC_VERSION=$(word 3, $(GCC_VERSION_FULL))
+# From g++ 4.7, c++0x11 has been supported
+GNUVERSION:=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
+CXX11SUPPOTED:= $(shell expr `gcc -dumpversion ` \>= 4.7)
 PWD=`pwd`
+
+ifeq "$(CXX11SUPPOTED)" "0"
+   	$(error Your c++ compiler does not support c++11)
+endif
 
 ACHIIVES=myLibTest
 
