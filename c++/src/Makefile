@@ -11,7 +11,7 @@ LIB_PATH=
 #Flags
 HDR_DIR= ../lib/
 CFLAG= -I$(HDR_DIR) -Wall -O -g
-CXXFLAGS= -I$(HDR_DIR) -std=c++11 -O -g -O2
+CXXFLAGS= -I$(HDR_DIR) -std=c++11 -g 
 LDFLAGS= 
 # From g++ 4.7, c++0x11 has been supported
 GNUVERSION:=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
@@ -39,9 +39,11 @@ ACHIIVES=myLibTest
 
 GLOBAL_SRC = 
 
-USER_SRC = list.cpp \
+USER_SRC = mainTest.cpp \
+		   list.cpp \
 		   mutex.cpp \
 		   ptr.cpp \
+		   sem.cpp \
 		   tree.cpp
 
 OBJECTS = $(GLOBAL_SRC:.cpp=.o) $(USER_SRC:.cpp=.o) 

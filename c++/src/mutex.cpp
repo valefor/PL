@@ -27,9 +27,7 @@ Mutex::Mutex() {
 }
 
 Mutex::~Mutex() {
-
-    memset(&mutex_, 0, sizeof(pthread_mutex_t));
-
+    //memset(&mutex_, 0, sizeof(pthread_mutex_t));
     int ret;
 
     if( (ret = pthread_mutex_destroy(&mutex_)) != 0 ) {

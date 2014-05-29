@@ -12,7 +12,7 @@ class ILockable {
     virtual ~ILockable() = 0;
 };
 
-class Lock: public ILockable{
+class Lock{
     public:
 
     explicit Lock(ILockable& lockable);
