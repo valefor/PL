@@ -17,7 +17,9 @@ Semaphore::~Semaphore()
 
 void Semaphore::wait()
 {
-    sem_wait(&sem_)== -1;
+    if (sem_wait(&sem_) == -1) {
+        std::cerr << "Failed to wait semaphore!\n";
+    }
 }
 
 void Semaphore::post()
