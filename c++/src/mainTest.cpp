@@ -11,6 +11,7 @@
 #include "stdio.h"
 #include <iostream>
 #include <semaphore.h>
+#include "util.h"
 
 #define MAXSIZE 100
 
@@ -126,4 +127,10 @@ int main(int argn, char ** argv) {
 
     cta.join();
     ctb.join();
+
+    class A : NonNewable {
+    };
+
+    // A a = new A; error, operator new is private
+    A a; // fine
 }
