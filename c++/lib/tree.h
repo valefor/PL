@@ -3,6 +3,47 @@
 #include <cassert>
 #include <functional>
 
+#include <stddef.h>
+
+/* -----------------------RB(red-black) Tree Implementation----------------- */
+
+/* ----------------------------Radix Tree Implementation-------------------- */
+union RadixNodePtr;
+
+// Internal node
+class RadixInterNode {
+    RadixInterNode* parent;
+    RadixNodePtr left;
+    RadixNodePtr right;
+    U16 bits;
+};
+
+class RadixNode {
+    U16 prefixLength; // Length of prefix, from 1 to 2^16-1
+    RadixInterNode * parent;
+
+    public:
+    RadixNode(U16 pl, RadixInterNode * p = nullptr): prefixLength(pl), parent(p){} 
+};
+
+union RadixNodePtr {
+    RadixInterNode* iNode;
+    RadixNode* rNode;
+
+};
+
+class RadixTree {
+    RadixNodePtr root;
+    U16 prefixOffset;
+
+    U32 iNodeCount; // Internal nodes count
+    U32 eNodeCount; // External nodes count
+
+    public:
+    bool add(RadixNode * rNode);
+};
+
+/* ------------------------------AVL Tree Implementation-------------------- */
 class AVLTraits {
     public:
     enum CmpResult {
@@ -87,9 +128,9 @@ class AVLTree
     ~AVLTree();
 
     bool insert(T t);
-    //T& find(T t);
     void remove(T& t);
     bool exist(T& t);
+    T& find(T t);
 
     iterator begin();
     const_iterator begin() const;
@@ -201,6 +242,9 @@ bool AVLTree<T, A>::insert(T t)
     }
     return true;
 }
+
+
+
 template <typename T, typename A>
 AVLNode<T> * AVLTree<T,A>::findInternal(T& t){
     AVLNode<T> * temp = root;
