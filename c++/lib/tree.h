@@ -2,29 +2,15 @@
 #include <memory>
 #include <cassert>
 #include <functional>
-
 #include <stddef.h>
+
+#include "stdtypes.h"
 
 /* -----------------------RB(red-black) Tree Implementation----------------- */
 
 /* ----------------------------Radix Tree Implementation-------------------- */
-union RadixNodePtr;
-
-// Internal node
-class RadixInterNode {
-    RadixInterNode* parent;
-    RadixNodePtr left;
-    RadixNodePtr right;
-    U16 bits;
-};
-
-class RadixNode {
-    U16 prefixLength; // Length of prefix, from 1 to 2^16-1
-    RadixInterNode * parent;
-
-    public:
-    RadixNode(U16 pl, RadixInterNode * p = nullptr): prefixLength(pl), parent(p){} 
-};
+class RadixNode;
+class RadixInterNode;
 
 union RadixNodePtr {
     RadixInterNode* iNode;
@@ -32,6 +18,33 @@ union RadixNodePtr {
 
 };
 
+// Sizeof(RadixNodePrefix) is 0 since it uses c empty array trick
+// This union was designed as a placeholder for later use
+union RadixNodePrefix {
+    U8 value[0] ;
+    const U8 * pValue[0];
+};
+
+// Internal node
+class RadixInterNode {
+    public:
+    RadixInterNode* parent;
+    RadixNodePtr left;
+    RadixNodePtr right;
+    U16 bits;
+    U16 flags;
+    RadixNode * attached;
+};
+
+class RadixNode {
+    public:
+    U16 prefixLength; // Length of prefix, from 1 to 2^16-1
+    RadixInterNode * parent;
+    RadixNode(U16 pl, RadixInterNode * p = nullptr): prefixLength(pl), parent(p){} 
+};
+
+// Invasion Radix Tree version which means Radix doesn't manage user defined
+// data, using invasion ways like pointer+offset to access user define data
 class RadixTree {
     RadixNodePtr root;
     U16 prefixOffset;
@@ -40,7 +53,12 @@ class RadixTree {
     U32 eNodeCount; // External nodes count
 
     public:
+    RadixTree(U16 pos): prefixOffset(pos), iNodeCount(0), eNodeCount(0){}
     bool add(RadixNode * rNode);
+    const U8 * getNodePrefix(RadixNode* rNode) {
+        RadixNodePrefix * prefix = (RadixNodePrefix*) (rNode + 1);
+        return prefix->value + prefixOffset;
+    }
 };
 
 /* ------------------------------AVL Tree Implementation-------------------- */

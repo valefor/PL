@@ -109,6 +109,8 @@ int main(int argn, char ** argv) {
         ++it;
     }
 
+    std::cout << "sizeof RadixNodePrefix:" << sizeof(RadixNodePrefix) << std::endl;
+
     // Threading Test
     // sem_init(&sem,0,0);
     Thread<Producer> pt1(false),pt2(false),pt3(false);
@@ -118,10 +120,10 @@ int main(int argn, char ** argv) {
     pt2.start();
     pt3.start();
 
-    cta.start();
-    ctb.start();
+    //cta.start();
+    //ctb.start();
 
-    pt1.join();
+    //pt1.join();
     //pt2.join();
     //pt3.join();
 
