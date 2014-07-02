@@ -158,8 +158,67 @@ bool RadixTree::add(RadixNode * rNode)
         currNode = root.iNode;
         while(true) {
             /*
-             * Bits of prefix of node we're adding is less than current node
+             * Give these 5 keys:
+             *              0123 4567
+             *
+             *      key1    0100 0001 / 8
+             *      key2    0100 1001 / 8
+             *      key3    0100 1010 / 8
+             *      key4    0100 0011 / 8
+             *      key5    0010 0001 / 8
+             *      key6    0100 1111 / 4
+             *  
+             *  Add key1:
+             *                  root.rNode = RadixNode(key1)
+             *
+             *  Add key2:
+             *                  root
+             *                    | 
+             *              iNode[bits:4]  
+             *                   / \
+             *           rNode  /   \ rNode
+             *        *rNode(key1) rNode(key2)
+             *
+             *  Add key3:
+             *                  root
+             *                    | 
+             *              iNode[bits:4]  
+             *                   / \
+             *           rNode  /   \ 
+             *          rNode(key1) iNode[bits:6]
+             *                          /\
+             *                         /  \
+             *              *rNode(key2)  rNode(key3)
+             *
+             *  Add key4:
+             *                  root
+             *                    | 
+             *              iNode[bits:4]  
+             *                 0 / \ 1
+             *                  /   \ 
+             *      iNode[bits:6] iNode[bits:6]
+             *         0 /\ 1         0 /\ 1
+             *          /  \           /  \
+             *rNode(key1) rNode(key4) /    \
+             *                rNode(key2) rNode(key3)
+             *
+             *  Add key5:
+             *                  root
+             *                    |
+             *              iNode[bits:1]
+             *               0 /     \ 1
+             *          rNode(key5)   \ 
+             *                    iNode[bits:4]  
+             *                       0 / \ 1
+             *                        /   \ 
+             *            iNode[bits:6] iNode[bits:6]
+             *               0 /\ 1         0 /\ 1
+             *                /  \           /  \
+             *      rNode(key1) rNode(key4) /    \
+             *                      rNode(key2) rNode(key3)
              */
+
+            // Bits of prefix of node we're adding is less than current node
             if (rNode->prefixLength <= currNode->bits) {
                 if (currNode->flags) {
                     if (BIT_TEST(currNode->flags, FLAG_IN_ATTACHED)) {
@@ -184,7 +243,9 @@ bool RadixTree::add(RadixNode * rNode)
                 // go on searching on right side tree
                 currNode = currNode->right.iNode;
             } else {
-                // go on searching on left side tree
+                // go on searching on left side tree(default)
+                // which means if there is no matchable prefix in current tree
+                // always use the leftmost leaf node as found node 
                 if (BIT_ISSET(currNode->flags, FLAG_IN_LEFT)) {
                     found = currNode->left.rNode;
                     break;
