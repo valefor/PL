@@ -1,5 +1,5 @@
 // smart pointer
-
+#include <cstddef>
 // simulate auto_ptr's functionality
 template<typename T>
 class SmartPtr {

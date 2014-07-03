@@ -96,15 +96,17 @@ static void RadixNodeLink(RadixInterNode * parent, RadixNode * origChild, RadixN
 */
 
 // Insert between external node and its internal node parent
-bool RadixTree::updateSubTree(RadixInterNode * parent,
-        RadixNode * child, RadixInterNode * insert)
+bool RadixTree::updateSubTree(RadixInterNode * insert,
+        RadixNode * found)
 {
+    RadixInterNode * parent = found->parent;
+    insert->parent = parent;
     // which means insertion happends at root node
     if (parent == nullptr) {
         root.iNode = insert;
-    } else if (parent->right.rNode == child) {
+    } else if (parent->right.rNode == found) {
         // insertion happends on right side, replace right side
-        // node with this internal node. reset flag
+        // external node with this internal node. reset flag
         parent->right.iNode = insert;
         BIT_RESET(parent->flags, FLAG_IN_RIGHT);
     } else {
@@ -112,27 +114,211 @@ bool RadixTree::updateSubTree(RadixInterNode * parent,
         parent->left.iNode = insert;
         BIT_RESET(parent->flags, FLAG_IN_LEFT);
     }
+
+    found->parent = insert;
+
 }
 
 // Insert between internal node and its internal node parent
-bool RadixTree::updateSubTree(RadixInterNode * parent,
-        RadixInterNode * child, RadixInterNode * insert)
+bool RadixTree::updateSubTree(RadixInterNode * insert,
+        RadixInterNode * found)
 {
+    RadixInterNode * parent = found->parent;
+    insert->parent = parent;
     // which means insertion happends at root node
     if (parent == nullptr) {
         root.iNode = insert;
-    } else if (parent->right.iNode == child) {
+    } else if (parent->right.iNode == found) {
         // insertion happends on right side, replace right side
-        // node with this internal node. reset flag
+        // internal node with this internal node.
         parent->right.iNode = insert;
-        BIT_RESET(parent->flags, FLAG_IN_RIGHT);
     } else {
         // insertion happends on left side
         parent->left.iNode = insert;
-        BIT_RESET(parent->flags, FLAG_IN_LEFT);
     }
+    
+    found->parent = insert;
 }
 
+// These 'link' functions are straightforward
+void RadixTree::link(RadixInterNode * internal, RadixInterNode * node, RadixInterNode *found)
+{
+
+}
+
+/*              iNode[bits:x]                     iNode[bits:x]                       
+ *                   / \                               / \                
+ *           rNode  /   \             OR       rNode  /   \               
+ *         rNode(key)  iNode[bits:x]       iNode[bits:x]  rNode(key)    
+ */
+void RadixTree::link(RadixInterNode * internal, RadixNode * node, RadixInterNode *found)
+{
+    if (internal==nullptr) return;
+
+    // the bits'th has be set in 'node' prefix, 'node' should on right side.
+    // otherwise, on the left side.
+    if (RadixBitTest(getNodePrefix(node), internal->bits)) {
+        internal->right.rNode = node;
+        internal->left.iNode = found;
+        // this internal node has an external node on right
+        internal->flags = FLAG_IN_R_EXT;
+    } else {
+        internal->left.rNode = node;
+        internal->right.iNode = found;
+        // this internal node has an external node on left
+        internal->flags = FLAG_IN_L_EXT;
+    }
+
+    // After linking these nodes together shall update the subtree
+    // The parent of 'found' should be the parent of this internal node
+    // and this internal node should be the new parent of 'found'
+    updateSubTree(internal,found);
+}
+
+/*              iNode[bits:x]  
+ *                   / \
+ *           rNode  /   \ rNode
+ *        *rNode(key1) rNode(key2)
+ */
+void RadixTree::link(RadixInterNode * internal, RadixNode * node, RadixNode *found)
+{
+    if (internal==nullptr) return;
+
+    // If user forget to set flag, set it here
+    if (internal->attached == found) 
+        internal->flags = BIT_SET(internal->flags, FLAG_IN_ATTACHED);
+
+    // If the internal node has an attached node which means it's an 
+    // 'route' internal node
+    if (internal->flags && BIT_ISSET(internal->flags, FLAG_IN_ATTACHED)) {
+        if (RadixBitTest(getNodePrefix(node), internal->bits)) {
+            internal->right.rNode = node;
+            internal->left.rNode = found;
+            internal->flags = internal->flags | FLAG_IN_L_ATTACHED | FLAG_IN_R_EXT;
+        } else {
+            internal->left.rNode = node;
+            internal->right.rNode = found;
+            internal->flags = internal->flags | FLAG_IN_R_ATTACHED | FLAG_IN_L_EXT;
+        }
+    
+    // It's a 'pure' internal node
+    } else {
+        // this internal node has external nodes on both right/left side
+        internal->flags = FLAG_IN_L_EXT | FLAG_IN_R_EXT;
+        // the bits'th has be set in 'node' prefix, 'node' should on right side.
+        // otherwise, on the left side.
+        if (RadixBitTest(getNodePrefix(node), internal->bits)) {
+            internal->right.rNode = node;
+            internal->left.rNode = found;
+        } else {
+            internal->left.rNode = node;
+            internal->right.rNode = found;
+        }
+    }
+
+    
+
+    // After linking these nodes together shall update the subtree
+    // The parent of 'found' should be the parent of this internal node
+    // and this internal node should be the new parent of 'found'
+    updateSubTree(internal,found);
+}
+
+/*
+ * Give these 7 keys:
+ *              0123 4567
+ *
+ *      key1    0100 0001 / 8
+ *      key2    0100 1001 / 8
+ *      key3    0100 1010 / 8
+ *      key4    0100 0011 / 8
+ *      key5    0010 0001 / 8
+ *      key6    0100 1111 / 4
+ *      key7    0100 0001 / 5
+ *      key8    0110 1111 / 3
+ *  
+ *  (1)Add key1, the easiest case:
+ *                  root.rNode = RadixNode(key1)
+ *
+ *  (2)Add key2, refers to [@Case1-1] :
+ *                  root
+ *                    | 
+ *              iNode[bits:4]  
+ *                   / \
+ *           rNode  /   \ rNode
+ *        *rNode(key1) rNode(key2)
+ *
+ *  (3)Add key3, refers to [@Case1-1]:
+ *                  root
+ *                    | 
+ *              iNode[bits:4]  
+ *                   / \
+ *           rNode  /   \ 
+ *          rNode(key1) iNode[bits:6]
+ *                          /\
+ *                         /  \
+ *              *rNode(key2)  rNode(key3)
+ *
+ *  (4)Add key4, refers to [@Case1-1]:
+ *                  root
+ *                    | 
+ *              iNode[bits:4]  
+ *                 0 / \ 1
+ *                  /   \ 
+ *      iNode[bits:6] iNode[bits:6]
+ *         0 /\ 1         0 /\ 1
+ *          /  \           /  \
+ *rNode(key1) rNode(key4) /    \
+ *                rNode(key2) rNode(key3)
+ *
+ *  (5)Add key5, refers to [@Case1-2]:
+ *                  root
+ *                    |
+ *              iNode[bits:1]
+ *               0 /     \ 1
+ *          rNode(key5)   \ 
+ *                    iNode[bits:4]  
+ *                       0 / \ 1
+ *                        /   \ 
+ *            iNode[bits:6] iNode[bits:6]
+ *               0 /\ 1         0 /\ 1
+ *                /  \           /  \
+ *     *rNode(key1) rNode(key4) /    \
+ *                      rNode(key2) rNode(key3)
+ *
+ *  (6)Add key6, refers to [@Case4-2]:
+ *                  root
+ *                    |
+ *              iNode[bits:1]
+ *               0 /     \ 1
+ *          rNode(key5)   \ 
+ *                    iNode[bits:4]--attached=rNode(key6)  
+ *                       0 / \ 1
+ *                        /   \ 
+ *            iNode[bits:6] iNode[bits:6]
+ *               0 /\ 1         0 /\ 1
+ *                /  \           /  \
+ *     *rNode(key1) rNode(key4) /    \
+ *                      rNode(key2) rNode(key3)
+ *
+ *  (7)Add key7, refers to [@Case4-1]:
+ *                  root
+ *                    |
+ *              iNode[bits:1]
+ *               0 /     \ 1
+ *          rNode(key5)   \ 
+ *                    iNode[bits:4]--attached=rNode(key6)  
+ *                       0 / \ 1
+ *                        /   \ 
+ *            iNode[bits:5] iNode[bits:6]
+ *               0 /\ 1 \       0 /\ 1
+ *                /  \  /attach  /  \
+ *     iNode[bits:6]  \/        /    \
+ *           /\        \rNode(key2) rNode(key3)
+ *          /  \        \
+ *         /    \    rNode(key7)   
+ * *rNode(key1) rNode(key4)
+ */
 bool RadixTree::add(RadixNode * rNode)
 {
     RadixInterNode * currNode;
@@ -157,66 +343,6 @@ bool RadixTree::add(RadixNode * rNode)
     } else {
         currNode = root.iNode;
         while(true) {
-            /*
-             * Give these 5 keys:
-             *              0123 4567
-             *
-             *      key1    0100 0001 / 8
-             *      key2    0100 1001 / 8
-             *      key3    0100 1010 / 8
-             *      key4    0100 0011 / 8
-             *      key5    0010 0001 / 8
-             *      key6    0100 1111 / 4
-             *  
-             *  Add key1:
-             *                  root.rNode = RadixNode(key1)
-             *
-             *  Add key2:
-             *                  root
-             *                    | 
-             *              iNode[bits:4]  
-             *                   / \
-             *           rNode  /   \ rNode
-             *        *rNode(key1) rNode(key2)
-             *
-             *  Add key3:
-             *                  root
-             *                    | 
-             *              iNode[bits:4]  
-             *                   / \
-             *           rNode  /   \ 
-             *          rNode(key1) iNode[bits:6]
-             *                          /\
-             *                         /  \
-             *              *rNode(key2)  rNode(key3)
-             *
-             *  Add key4:
-             *                  root
-             *                    | 
-             *              iNode[bits:4]  
-             *                 0 / \ 1
-             *                  /   \ 
-             *      iNode[bits:6] iNode[bits:6]
-             *         0 /\ 1         0 /\ 1
-             *          /  \           /  \
-             *rNode(key1) rNode(key4) /    \
-             *                rNode(key2) rNode(key3)
-             *
-             *  Add key5:
-             *                  root
-             *                    |
-             *              iNode[bits:1]
-             *               0 /     \ 1
-             *          rNode(key5)   \ 
-             *                    iNode[bits:4]  
-             *                       0 / \ 1
-             *                        /   \ 
-             *            iNode[bits:6] iNode[bits:6]
-             *               0 /\ 1         0 /\ 1
-             *                /  \           /  \
-             *      rNode(key1) rNode(key4) /    \
-             *                      rNode(key2) rNode(key3)
-             */
 
             // Bits of prefix of node we're adding is less than current node
             if (rNode->prefixLength <= currNode->bits) {
@@ -260,12 +386,14 @@ bool RadixTree::add(RadixNode * rNode)
     diffBit = RadixBitFindDiff(getNodePrefix(rNode), getNodePrefix(found), minPrefixLen);
 
     /*
+     * [@Case1]They have different prefix:
      * The first different bit index is lower than prefix length, what does it mean?
      * suppose we have a key=0111 0011, prefix length is 4, the node we have found has
      * key=0110 0011, prefix length is 5, first different index is 2, that means these 
      * two nodes should not be on same branch since 2 is less than 4, they should fork
      * from "01"
      *
+     * diffBit can never bigger than minPrefixLen:
      */
     if (diffBit < minPrefixLen) {
         // A new internal node should be created to link tree
@@ -275,27 +403,15 @@ bool RadixTree::add(RadixNode * rNode)
 
         if (currNode == nullptr || newInode->bits > currNode->bits) {
             /*
+             * [@Case1-1]:
              * If newly created node is between found node(a external node) 
              * and its parent(currNode, a internal node)
              */
-            newInode->parent = currNode;
-            // this internal node has external nodes on both right/left side
-            newInode->flags = FLAG_IN_L_EXT | FLAG_IN_R_EXT;
-
-            // the bits'th has be set in rNode prefix, rNode should on right side.
-            // otherwise, on the left side.
-            if (RadixBitTest(getNodePrefix(rNode), newInode->bits)) {
-                newInode->right.rNode = rNode;
-                newInode->left.rNode = found;
-            } else {
-                newInode->left.rNode = rNode;
-                newInode->right.rNode = found;
-            }
-
+            link(newInode, rNode, found);
             // Last we should update/adjust the sub tree which currNode points to
-            updateSubTree(currNode, found, newInode);
+            // updateSubTree(currNode, found, newInode);
         } else {
-            // Insertion happends up the tree(currNode)
+            // [@Case1-2] : Insertion happends up the tree(currNode)
             RadixInterNode * parent = currNode->parent;
             // Search back up until we find node whose bits fit this diffBit
             while (parent && ( newInode->bits < parent->bits)) {
@@ -306,22 +422,237 @@ bool RadixTree::add(RadixNode * rNode)
             
             // Node to insert found, the node to be added is between this parent and
             // currNode 
-            newInode->parent = parent;
-            if (RadixBitTest(getNodePrefix(rNode), newInode->bits)) {
-                newInode->right.rNode = rNode;
-                newInode->left.iNode = currNode;
-                // this internal node has an external node on right
-                newInode->flags = FLAG_IN_R_EXT;
-            } else {
-                newInode->left.rNode = rNode;
-                newInode->right.iNode = currNode;
-                // this internal node has an external node on left
-                newInode->flags = FLAG_IN_L_EXT;
-            }
+            link(newInode, rNode, currNode);
 
             // Last we should update/adjust the sub tree which currNode points to
-            //updateSubTree(parent, found, newInode);
+            // updateSubTree(parent, currNode, newInode);
         }
 
+    /*
+     * [@Case2]They have same minimum prefix and same prefix length
+     * The 'rNode' shall be linked behind 'found'
+     *
+     * minPrefixLen == rNode->prefixLength == found->prefixLength == diffBit
+     */
+    } else if (rNode->prefixLength == found->prefixLength) {
+        // Not supported yet
+    
+    /*
+     * [@Case3]They have same minimum prefix and prefix length of node to be added is longer
+     * That means 'rNode' is more specific and 'found' would be attached on that internal 
+     * node whose 'bits' fits 'found's prefix length
+     *
+     * minPrefixLen == found->prefixLength == diffBit
+     */
+    } else if (rNode->prefixLength > found->prefixLength) {
+    
+    /*
+     * [@Case4]They have same minimum prefix and prefix length of node to be added is shorter
+     * The 'rNode' should be attached to a internal node above 'found'
+     *
+     * minPrefixLen == rNode->prefixLength == diffBit
+     */
+    } else { 
+        RadixInterNode * newInode = new RadixInterNode();
+        newInode->bits = rNode->prefixLength;
+        newInode->attached = rNode;
+        newInode->flags = FLAG_IN_ATTACHED;
+        rNode->parent = newInode;
+
+        if (currNode == nullptr || newInode->bits > currNode->bits) {
+            /*
+             * [@Case4-1]:
+             * If newly created node is between found node(a external node) 
+             * and its parent(currNode, a internal node)
+             */
+            link(newInode, rNode, found);
+            // Last we should update/adjust the sub tree which currNode points to
+            // updateSubTree(currNode, found, newInode);
+        } else { 
+            // [@Case4-2] : Insertion happends up the tree(currNode)
+            RadixInterNode * parent = currNode->parent;
+            // Search back up until we find node whose bits fit this diffBit
+            while (parent && ( newInode->bits < parent->bits)) {
+                currNode = parent;
+                parent = currNode->parent;
+            }
+            // if ( (!parent || ( newInode->bits != parent->bits )))
+            
+            if (currNode->bits == newInode->bits) {
+                // [@Case4-2-1]: Replace currNode with newInode
+                newInode->left = currNode->left;
+                newInode->right = currNode->right;
+                newInode->flags = currNode->flags | FLAG_IN_ATTACHED;
+            } else if (RadixBitTest(getNodePrefix(found)), newInode->bits) {
+                // [@Case4-2-2]: 'Found' is on the right path of 'newInode'
+                // that means its parent:currNode is the right child of 'newInode'
+                // but the problem is who shall be the left child? we use attched one
+
+            } else {
+                // [@Case4-2-3]: 'Found' is on the left path of 'newInode'
+                // that means its parent:currNode is the left child of 'newInode'
+            }
+            // Node to insert found, the node to be added is between this parent and
+            // currNode 
+            link(newInode, rNode, currNode);
+
+            // Last we should update/adjust the sub tree which currNode points to
+            // updateSubTree(parent, currNode, newInode);
+        }
     }
 }
+
+// Introduction version with more details
+//  bool RadixTree::add(RadixNode * rNode)
+//  {
+//      RadixInterNode * currNode;
+//      RadixNode  * found;
+//      U16 minPrefixLen, diffBit;
+//      const U8 * thePrefix;
+//  
+//      if (rNode == nullptr) return false;
+//  
+//      // At the very beginning, no nodes at all, attach this node on root
+//      if (root.iNode == nullptr) {
+//          rNode->parent = nullptr;
+//          root.rNode = rNode;
+//          eNodeCount ++ ;    
+//      }
+//  
+//      thePrefix = getNodePrefix(rNode);
+//  
+//      if (iNodeCount == 0) {
+//          currNode = nullptr;
+//          found = root.rNode;
+//      } else {
+//          currNode = root.iNode;
+//          while(true) {
+//  
+//              // Bits of prefix of node we're adding is less than current node
+//              if (rNode->prefixLength <= currNode->bits) {
+//                  if (currNode->flags) {
+//                      if (BIT_TEST(currNode->flags, FLAG_IN_ATTACHED)) {
+//                          found = currNode->attached;
+//                      } else if (BIT_TEST(currNode->flags, FLAG_IN_R_EXT)) {
+//                          found = currNode->right.rNode;
+//                      } else {
+//                          found = currNode->left.rNode;
+//                      }
+//                      break;
+//                  }
+//                  // no flags set means it's an internal node with internal nodes 
+//                  // on right and left, go further to find leaf node
+//                  currNode = currNode->left.iNode;
+//              } else if (RadixBitTest(getNodePrefix(rNode),currNode->bits)) {
+//                  // the prefix of adding node fits the currNode and the currNode
+//                  // has leaf node, we find it.
+//                  if (BIT_ISSET(currNode->flags, FLAG_IN_RIGHT)) {
+//                      found = currNode->right.rNode;
+//                      break;
+//                  }
+//                  // go on searching on right side tree
+//                  currNode = currNode->right.iNode;
+//              } else {
+//                  // go on searching on left side tree(default)
+//                  // which means if there is no matchable prefix in current tree
+//                  // always use the leftmost leaf node as found node 
+//                  if (BIT_ISSET(currNode->flags, FLAG_IN_LEFT)) {
+//                      found = currNode->left.rNode;
+//                      break;
+//                  }
+//                  currNode = currNode->left.iNode;
+//              }
+//          }
+//      }
+//  
+//      minPrefixLen = (rNode->prefixLength <= found->prefixLength) ?
+//          rNode->prefixLength : found->prefixLength;
+//      diffBit = RadixBitFindDiff(getNodePrefix(rNode), getNodePrefix(found), minPrefixLen);
+//  
+//      /*
+//       * [@Case1]They have different prefix:
+//       * The first different bit index is lower than prefix length, what does it mean?
+//       * suppose we have a key=0111 0011, prefix length is 4, the node we have found has
+//       * key=0110 0011, prefix length is 5, first different index is 2, that means these 
+//       * two nodes should not be on same branch since 2 is less than 4, they should fork
+//       * from "01"
+//       *
+//       */
+//      if (diffBit < minPrefixLen) {
+//          // A new internal node should be created to link tree
+//          RadixInterNode * newInode = new RadixInterNode();
+//          newInode->bits = diffBit;
+//          rNode->parent = newInode;
+//  
+//          if (currNode == nullptr || newInode->bits > currNode->bits) {
+//              /*
+//               * If newly created node is between found node(a external node) 
+//               * and its parent(currNode, a internal node)
+//               */
+//              newInode->parent = currNode;
+//              // this internal node has external nodes on both right/left side
+//              newInode->flags = FLAG_IN_L_EXT | FLAG_IN_R_EXT;
+//  
+//              // the bits'th has be set in rNode prefix, rNode should on right side.
+//              // otherwise, on the left side.
+//              if (RadixBitTest(getNodePrefix(rNode), newInode->bits)) {
+//                  newInode->right.rNode = rNode;
+//                  newInode->left.rNode = found;
+//              } else {
+//                  newInode->left.rNode = rNode;
+//                  newInode->right.rNode = found;
+//              }
+//  
+//              // Last we should update/adjust the sub tree which currNode points to
+//              updateSubTree(currNode, found, newInode);
+//          } else {
+//              // Insertion happends up the tree(currNode)
+//              RadixInterNode * parent = currNode->parent;
+//              // Search back up until we find node whose bits fit this diffBit
+//              while (parent && ( newInode->bits < parent->bits)) {
+//                  currNode = parent;
+//                  parent = currNode->parent;
+//              }
+//              // if ( (!parent || ( newInode->bits != parent->bits )))
+//              
+//              // Node to insert found, the node to be added is between this parent and
+//              // currNode 
+//              newInode->parent = parent;
+//              if (RadixBitTest(getNodePrefix(rNode), newInode->bits)) {
+//                  newInode->right.rNode = rNode;
+//                  newInode->left.iNode = currNode;
+//                  // this internal node has an external node on right
+//                  newInode->flags = FLAG_IN_R_EXT;
+//              } else {
+//                  newInode->left.rNode = rNode;
+//                  newInode->right.iNode = currNode;
+//                  // this internal node has an external node on left
+//                  newInode->flags = FLAG_IN_L_EXT;
+//              }
+//  
+//              // Last we should update/adjust the sub tree which currNode points to
+//              //updateSubTree(parent, found, newInode);
+//          }
+//  
+//      /*
+//       * [@Case2]They have same minimum prefix and same prefix length
+//       * 
+//       *
+//       */
+//      } else if (rNode->prefixLength == found->prefixLength) {
+//      
+//      /*
+//       * [@Case3]They have same minimum prefix and prefix length of node to be added is longer
+//       * 
+//       *
+//       */
+//      } else if (rNode->prefixLength > found->prefixLength) {
+//      
+//      /*
+//       * [@Case4]They have same minimum prefix and prefix length of node to be added is shorter
+//       * 
+//       *
+//       */
+//      } else {
+//      }
+//  }

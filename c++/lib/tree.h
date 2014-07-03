@@ -2,13 +2,14 @@
 #include <memory>
 #include <cassert>
 #include <functional>
-#include <stddef.h>
+#include <cstddef>
 
 #include "stdtypes.h"
 
+
 /* -----------------------RB(red-black) Tree Implementation----------------- */
 
-/* ----------------------------Radix Tree Implementation-------------------- */
+/* -------------------------Radix(PAT) Tree Implementation-------------------- */
 class RadixNode;
 class RadixInterNode;
 
@@ -51,6 +52,13 @@ class RadixTree {
 
     U32 iNodeCount; // Internal nodes count
     U32 eNodeCount; // External nodes count
+
+    bool updateSubTree(RadixInterNode * insert, RadixNode * found);
+    bool updateSubTree(RadixInterNode * insert, RadixInterNode * found);
+
+    void link(RadixInterNode * parent, RadixInterNode * node, RadixInterNode *found);
+    void link(RadixInterNode * parent, RadixNode * node, RadixInterNode *found);
+    void link(RadixInterNode * parent, RadixNode * node, RadixNode *found);
 
     public:
     RadixTree(U16 pos): prefixOffset(pos), iNodeCount(0), eNodeCount(0){}
