@@ -1,0 +1,6 @@
+[{"./Enter_Sandman.mp3",
+  {"ID3v1.1",
+   [{track,1},
+    {title,<<"Enter Sandman">>},
+    {artist,<<"Metallica">>},
+    {album,<<"Metallica">>}]}}].
