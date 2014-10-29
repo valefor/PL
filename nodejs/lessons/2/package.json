@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "utility": "^1.2.0",
-    "express": "^4.10.1"
+    "express": "^4.10.1",
+    "superagent": "^0.20.0",
+    "cheerio": "^0.17.0"
   }
 }
