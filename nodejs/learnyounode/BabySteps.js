@@ -1,4 +1,8 @@
 var sum = 0;
 
-sum = Number(process.argv[2])
+for (var i = 2; i < process.argv.length; i++) {
+    sum += Number(process.argv[i]);
+}
 console.log(sum);
+
+//console.log(process.argv);
