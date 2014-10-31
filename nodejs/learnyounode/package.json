@@ -1,0 +1,16 @@
+{
+  "name": "learnyounode_exercise",
+  "version": "0.0.0",
+  "description": "",
+  "main": "BabySteps.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bl": "^0.9.3",
+    "strftime": "^0.8.2",
+    "through2-map": "^1.4.0"
+  }
+}
